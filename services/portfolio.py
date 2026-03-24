@@ -1,6 +1,7 @@
 from db.database import get_connection
 from utils.logger import setup_logger
 from services.stock import get_latest_price
+from services.stock import calculate_unrealized_pnl, calculate_realized_pnl
 
 logger = setup_logger()
 
@@ -45,3 +46,39 @@ def calculate_portfolio_value():
         
     logger.info(f"TOTAL VALUE: {total_value:.2f}")
     return total_value
+
+def calculate_total_unrealized_pnl():
+    try:
+        holdings = calculate_holdings()
+        logger.info("Calculating total unrealized P&L...")
+        
+        total = 0.0
+        
+        for ticker in holdings.keys():
+            unrealized_pnl = calculate_unrealized_pnl(ticker)
+            total += unrealized_pnl
+            logger.debug(f"{ticker}: Unrealized P&L = {unrealized_pnl:.2f}")
+        
+        logger.info(f"TOTAL UNREALIZED P&L: {total:.2f}")
+        return total
+    except Exception as e:
+        logger.error(f"Error calculating total unrealized P&L: {str(e)}")
+        return 0.0
+
+def calculate_total_realized_pnl():
+    try:
+        holdings = calculate_holdings()
+        logger.info("Calculating total realized P&L...")
+        
+        total = 0.0
+        
+        for ticker in holdings.keys():
+            realized_pnl = calculate_realized_pnl(ticker)
+            total += realized_pnl['realized_pnl']
+            logger.debug(f"{ticker}: Realized P&L = {realized_pnl['realized_pnl']:.2f}")
+        
+        logger.info(f"TOTAL REALIZED P&L: {total:.2f}")
+        return total
+    except Exception as e:
+        logger.error(f"Error calculating total realized P&L: {str(e)}")
+        return 0.0

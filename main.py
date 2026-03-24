@@ -1,6 +1,12 @@
 from config import TICKERS
 from db.database import create_tables
-from services.portfolio import log_trade, calculate_holdings, calculate_portfolio_value
+from services.portfolio import (
+    log_trade, 
+    calculate_holdings, 
+    calculate_portfolio_value,
+    calculate_total_unrealized_pnl,
+    calculate_total_realized_pnl
+    )
 from services.stock import update_ticker
 from utils.logger import setup_logger
 
@@ -32,9 +38,15 @@ def main():
     run_trade_test()
     
     holdings = calculate_holdings()
-    print("\nHOLDINGS:", holdings)
     total_value = calculate_portfolio_value()
-    print("\nPORTFOLIO VALUE:", total_value)
+    unrealized = calculate_total_unrealized_pnl()
+    realized = calculate_total_realized_pnl()
+    
+    print("\nHOLDINGS:", holdings)
+    print(f"PORTFOLIO VALUE: {total_value:.2f} EUR")
+    print(f"TOTAL UNREALIZED P&L: {unrealized:.2f} EUR")
+    print(f"TOTAL REALIZED P&L: {realized:.2f} EUR")
+    print(f"Total P&L: {(realized + unrealized):.2f} EUR")
 
 
 

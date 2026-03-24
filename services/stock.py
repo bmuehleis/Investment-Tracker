@@ -96,3 +96,76 @@ def get_latest_price(ticker):
         
         result = cursor.fetchone()
     return result[0] if result else None
+
+def get_trades_per_ticker(ticker):
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        
+        cursor.execute("""
+                       SELECT date, action, quantity, price, currency, commission
+                       FROM transactions
+                       WHERE ticker = ?
+                       ORDER BY date ASC
+                       """, (ticker,))
+        
+        return cursor.fetchall()
+
+def calculate_realized_pnl(ticker):
+    trades = get_trades_per_ticker(ticker)
+    if not trades:
+        logger.info(f"No trades found for {ticker}")
+        return 0.0
+    
+    total_shares = 0.0
+    realized_pnl = 0.0
+    total_cost = 0.0
+
+    for date, action, quantity, price, currency, commission in trades:
+        
+        if action == "BUY":
+            total_cost += quantity * price + commission
+            total_shares += quantity
+            logger.debug(f"{ticker} BUY: {quantity} shares at {price}, total shares: {total_shares}")
+        
+        elif action == "SELL":
+            if total_shares <= 0:
+                logger.warning(f"SELL action for {ticker} without shares to sell")
+                continue
+            
+            avg_price = total_cost / total_shares
+            
+            sell_value = quantity * price - commission
+            cost_basis = quantity * avg_price
+            
+            realized_pnl += sell_value - cost_basis
+            
+            total_shares -= quantity
+            total_cost -= cost_basis
+            logger.debug(f"{ticker} SELL: {quantity} shares at {price}, realized PnL: {sell_value - cost_basis}")
+    
+    avg_price = total_cost / total_shares if total_shares > 0 else 0
+    logger.info(f"{ticker} PnL calculation: shares={total_shares}, avg_price={avg_price}, realized_pnl={realized_pnl}")
+    
+    return {
+        "shares": total_shares,
+        "avg_price": avg_price,
+        "realized_pnl": realized_pnl
+    }
+
+def calculate_unrealized_pnl(ticker):
+    pnl_data = calculate_realized_pnl(ticker)
+    
+    shares = pnl_data["shares"] 
+    avg_price = pnl_data["avg_price"]
+    
+    if shares <= 0:
+        logger.warning(f"Unrealized pnl action for {ticker} without shares to calculate")
+        return 0
+    
+    current_price = get_latest_price(ticker)
+    
+    if current_price is None:
+        logger.warning(f"Cannot calculate unrealized pnl for {ticker} - no price data")
+        return 0
+    
+    return (current_price - avg_price) * shares

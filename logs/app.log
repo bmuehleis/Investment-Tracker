@@ -15,3 +15,70 @@
 2026-03-23 20:39:18,931 | INFO | AAPL: 12.0 sharex x 252.10 = 3025.20
 2026-03-23 20:39:18,931 | INFO | MSFT: 12.0 sharex x 383.30 = 4599.60
 2026-03-23 20:39:18,932 | INFO | TOTAL VALUE: 7624.80
+2026-03-24 18:43:56,340 | INFO | Fetching AAPL...
+2026-03-24 18:43:58,421 | INFO | AAPL updated successfully
+2026-03-24 18:43:58,422 | INFO | Fetching MSFT...
+2026-03-24 18:43:58,554 | INFO | MSFT updated successfully
+2026-03-24 18:43:58,555 | INFO | Fetching GOOGL...
+2026-03-24 18:43:58,655 | INFO | GOOGL updated successfully
+2026-03-24 18:43:58,655 | INFO | Inserting test trades...
+2026-03-24 18:43:58,660 | INFO | Trade logged: BUY 10 AAPL @ 150.0
+2026-03-24 18:43:58,664 | INFO | Trade logged: BUY 5 AAPL @ 170.0
+2026-03-24 18:43:58,668 | INFO | Trade logged: SELL 3 AAPL @ 180.0
+2026-03-24 18:43:58,671 | INFO | Trade logged: BUY 8 MSFT @ 300.0
+2026-03-24 18:43:58,675 | INFO | Trade logged: BUY 4 MSFT @ 320.0
+2026-03-24 18:43:58,675 | INFO | Trade test complete
+2026-03-24 18:43:58,677 | INFO | Calculating portfolio value...
+2026-03-24 18:43:58,678 | INFO | AAPL: 24.0 sharex x 252.34 = 6056.16
+2026-03-24 18:43:58,678 | INFO | MSFT: 24.0 sharex x 372.65 = 8943.60
+2026-03-24 18:43:58,678 | INFO | TOTAL VALUE: 14999.76
+2026-03-24 18:43:58,680 | INFO | Calculating total unrealized P&L...
+2026-03-24 18:43:58,681 | ERROR | Error calculating total unrealized P&L: no such table: trades
+2026-03-24 18:43:58,681 | INFO | Calculating total realized P&L...
+2026-03-24 18:43:58,682 | ERROR | Error calculating total realized P&L: no such table: trades
+2026-03-24 18:44:46,902 | INFO | Fetching AAPL...
+2026-03-24 18:44:47,294 | INFO | AAPL updated successfully
+2026-03-24 18:44:47,296 | INFO | Fetching MSFT...
+2026-03-24 18:44:47,417 | INFO | MSFT updated successfully
+2026-03-24 18:44:47,418 | INFO | Fetching GOOGL...
+2026-03-24 18:44:47,574 | INFO | GOOGL updated successfully
+2026-03-24 18:44:47,574 | INFO | Inserting test trades...
+2026-03-24 18:44:47,578 | INFO | Trade logged: BUY 10 AAPL @ 150.0
+2026-03-24 18:44:47,582 | INFO | Trade logged: BUY 5 AAPL @ 170.0
+2026-03-24 18:44:47,587 | INFO | Trade logged: SELL 3 AAPL @ 180.0
+2026-03-24 18:44:47,591 | INFO | Trade logged: BUY 8 MSFT @ 300.0
+2026-03-24 18:44:47,597 | INFO | Trade logged: BUY 4 MSFT @ 320.0
+2026-03-24 18:44:47,597 | INFO | Trade test complete
+2026-03-24 18:44:47,600 | INFO | Calculating portfolio value...
+2026-03-24 18:44:47,601 | INFO | AAPL: 12.0 sharex x 252.34 = 3028.02
+2026-03-24 18:44:47,602 | INFO | MSFT: 12.0 sharex x 372.52 = 4470.18
+2026-03-24 18:44:47,602 | INFO | TOTAL VALUE: 7498.20
+2026-03-24 18:44:47,602 | INFO | Calculating total unrealized P&L...
+2026-03-24 18:44:47,603 | ERROR | Error calculating total unrealized P&L: no such column: commission
+2026-03-24 18:44:47,604 | INFO | Calculating total realized P&L...
+2026-03-24 18:44:47,605 | ERROR | Error calculating total realized P&L: no such column: commission
+2026-03-24 18:46:16,777 | INFO | Fetching AAPL...
+2026-03-24 18:46:17,360 | INFO | AAPL updated successfully
+2026-03-24 18:46:17,361 | INFO | Fetching MSFT...
+2026-03-24 18:46:17,483 | INFO | MSFT updated successfully
+2026-03-24 18:46:17,485 | INFO | Fetching GOOGL...
+2026-03-24 18:46:17,654 | INFO | GOOGL updated successfully
+2026-03-24 18:46:17,655 | INFO | Inserting test trades...
+2026-03-24 18:46:17,659 | INFO | Trade logged: BUY 10 AAPL @ 150.0
+2026-03-24 18:46:17,662 | INFO | Trade logged: BUY 5 AAPL @ 170.0
+2026-03-24 18:46:17,666 | INFO | Trade logged: SELL 3 AAPL @ 180.0
+2026-03-24 18:46:17,670 | INFO | Trade logged: BUY 8 MSFT @ 300.0
+2026-03-24 18:46:17,674 | INFO | Trade logged: BUY 4 MSFT @ 320.0
+2026-03-24 18:46:17,675 | INFO | Trade test complete
+2026-03-24 18:46:17,676 | INFO | Calculating portfolio value...
+2026-03-24 18:46:17,677 | INFO | AAPL: 12.0 sharex x 252.43 = 3029.22
+2026-03-24 18:46:17,678 | INFO | MSFT: 12.0 sharex x 372.54 = 4470.48
+2026-03-24 18:46:17,678 | INFO | TOTAL VALUE: 7499.70
+2026-03-24 18:46:17,678 | INFO | Calculating total unrealized P&L...
+2026-03-24 18:46:17,679 | INFO | AAPL PnL calculation: shares=12.0, avg_price=156.79999999999998, realized_pnl=68.59999999999997
+2026-03-24 18:46:17,680 | INFO | MSFT PnL calculation: shares=12.0, avg_price=306.8333333333333, realized_pnl=0.0
+2026-03-24 18:46:17,680 | INFO | TOTAL UNREALIZED P&L: 1936.10
+2026-03-24 18:46:17,681 | INFO | Calculating total realized P&L...
+2026-03-24 18:46:17,682 | INFO | AAPL PnL calculation: shares=12.0, avg_price=156.79999999999998, realized_pnl=68.59999999999997
+2026-03-24 18:46:17,682 | INFO | MSFT PnL calculation: shares=12.0, avg_price=306.8333333333333, realized_pnl=0.0
+2026-03-24 18:46:17,683 | INFO | TOTAL REALIZED P&L: 68.60
