@@ -68,6 +68,18 @@ def edit_trade(trade_id, **fields):
         logger.error(f"Error updating trade with ID {trade_id}: {e}")
 
 
+def get_all_trades():
+    try:
+        with get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM transactions ORDER BY date DESC")
+            trades = cursor.fetchall()
+        return trades
+    except Exception as e:
+        logger.error(f"Error fetching all trades: {e}")
+        return []
+
+
 def calculate_portfolio_value():
     holdings = calculate_holdings()
     

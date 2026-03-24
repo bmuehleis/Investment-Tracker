@@ -1,0 +1,18 @@
+2026-03-24 20:28:07,848 | INFO | Calculating total unrealized P&L
+2026-03-24 20:28:07,848 | INFO | Calculating unrealized P&L for AAPL
+2026-03-24 20:28:07,849 | INFO | Calculating FIFO P&L for AAPL
+2026-03-24 20:28:07,849 | INFO | Fetching trades for AAPL
+2026-03-24 20:28:07,850 | INFO | AAPL FIFO result realized=88.70, remaining=12.0
+2026-03-24 20:28:07,851 | INFO | Calculating unrealized P&L for MSFT
+2026-03-24 20:28:07,851 | INFO | Calculating FIFO P&L for MSFT
+2026-03-24 20:28:07,852 | INFO | Fetching trades for MSFT
+2026-03-24 20:28:07,852 | INFO | MSFT FIFO result realized=0.00, remaining=12.0
+2026-03-24 20:28:07,853 | INFO | Total unrealized P&L: 1937.48
+2026-03-24 20:28:17,069 | INFO | Calculating total realized P&L
+2026-03-24 20:28:17,070 | INFO | Calculating FIFO P&L for AAPL
+2026-03-24 20:28:17,070 | INFO | Fetching trades for AAPL
+2026-03-24 20:28:17,071 | INFO | AAPL FIFO result realized=88.70, remaining=12.0
+2026-03-24 20:28:17,071 | INFO | Calculating FIFO P&L for MSFT
+2026-03-24 20:28:17,072 | INFO | Fetching trades for MSFT
+2026-03-24 20:28:17,072 | INFO | MSFT FIFO result realized=0.00, remaining=12.0
+2026-03-24 20:28:17,073 | INFO | Total realized P&L: 88.70
