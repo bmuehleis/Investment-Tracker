@@ -16,3 +16,131 @@
 2026-03-24 20:28:17,072 | INFO | Fetching trades for MSFT
 2026-03-24 20:28:17,072 | INFO | MSFT FIFO result realized=0.00, remaining=12.0
 2026-03-24 20:28:17,073 | INFO | Total realized P&L: 88.70
+2026-03-24 20:47:10,457 | INFO | Trade logged: BUY 4.0 GOOGL @ 245.0
+2026-03-24 20:47:30,839 | INFO | Calculating total unrealized P&L
+2026-03-24 20:47:30,840 | INFO | Calculating unrealized P&L for AAPL
+2026-03-24 20:47:30,841 | INFO | Calculating FIFO P&L for AAPL
+2026-03-24 20:47:30,841 | INFO | Fetching trades for AAPL
+2026-03-24 20:47:30,842 | INFO | AAPL FIFO result realized=88.70, remaining=12.0
+2026-03-24 20:47:30,843 | INFO | Calculating unrealized P&L for MSFT
+2026-03-24 20:47:30,843 | INFO | Calculating FIFO P&L for MSFT
+2026-03-24 20:47:30,843 | INFO | Fetching trades for MSFT
+2026-03-24 20:47:30,844 | INFO | MSFT FIFO result realized=0.00, remaining=12.0
+2026-03-24 20:47:30,845 | INFO | Calculating unrealized P&L for GOOGL
+2026-03-24 20:47:30,845 | INFO | Calculating FIFO P&L for GOOGL
+2026-03-24 20:47:30,846 | INFO | Fetching trades for GOOGL
+2026-03-24 20:47:30,846 | INFO | GOOGL FIFO result realized=0.00, remaining=4.0
+2026-03-24 20:47:30,847 | INFO | Total unrealized P&L: 2128.44
+2026-03-24 20:47:36,988 | INFO | Calculating total realized P&L
+2026-03-24 20:47:36,990 | INFO | Calculating FIFO P&L for AAPL
+2026-03-24 20:47:36,991 | INFO | Fetching trades for AAPL
+2026-03-24 20:47:36,991 | INFO | AAPL FIFO result realized=88.70, remaining=12.0
+2026-03-24 20:47:36,992 | INFO | Calculating FIFO P&L for MSFT
+2026-03-24 20:47:36,992 | INFO | Fetching trades for MSFT
+2026-03-24 20:47:36,993 | INFO | MSFT FIFO result realized=0.00, remaining=12.0
+2026-03-24 20:47:36,993 | INFO | Calculating FIFO P&L for GOOGL
+2026-03-24 20:47:36,994 | INFO | Fetching trades for GOOGL
+2026-03-24 20:47:36,995 | INFO | GOOGL FIFO result realized=0.00, remaining=4.0
+2026-03-24 20:47:36,995 | INFO | Total realized P&L: 88.70
+2026-03-24 20:48:01,182 | INFO | Trade logged: SELL 2.0 GOOGL @ 275.0
+2026-03-24 20:48:06,399 | INFO | Calculating total realized P&L
+2026-03-24 20:48:06,402 | INFO | Calculating FIFO P&L for AAPL
+2026-03-24 20:48:06,402 | INFO | Fetching trades for AAPL
+2026-03-24 20:48:06,403 | INFO | AAPL FIFO result realized=88.70, remaining=12.0
+2026-03-24 20:48:06,403 | INFO | Calculating FIFO P&L for MSFT
+2026-03-24 20:48:06,404 | INFO | Fetching trades for MSFT
+2026-03-24 20:48:06,404 | INFO | MSFT FIFO result realized=0.00, remaining=12.0
+2026-03-24 20:48:06,405 | INFO | Calculating FIFO P&L for GOOGL
+2026-03-24 20:48:06,405 | INFO | Fetching trades for GOOGL
+2026-03-24 20:48:06,406 | INFO | GOOGL FIFO result realized=57.00, remaining=2.0
+2026-03-24 20:48:06,406 | INFO | Total realized P&L: 145.70
+2026-03-24 20:48:10,429 | INFO | Calculating total unrealized P&L
+2026-03-24 20:48:10,430 | INFO | Calculating unrealized P&L for AAPL
+2026-03-24 20:48:10,430 | INFO | Calculating FIFO P&L for AAPL
+2026-03-24 20:48:10,430 | INFO | Fetching trades for AAPL
+2026-03-24 20:48:10,431 | INFO | AAPL FIFO result realized=88.70, remaining=12.0
+2026-03-24 20:48:10,432 | INFO | Calculating unrealized P&L for MSFT
+2026-03-24 20:48:10,432 | INFO | Calculating FIFO P&L for MSFT
+2026-03-24 20:48:10,432 | INFO | Fetching trades for MSFT
+2026-03-24 20:48:10,434 | INFO | MSFT FIFO result realized=0.00, remaining=12.0
+2026-03-24 20:48:10,435 | INFO | Calculating unrealized P&L for GOOGL
+2026-03-24 20:48:10,435 | INFO | Calculating FIFO P&L for GOOGL
+2026-03-24 20:48:10,435 | INFO | Fetching trades for GOOGL
+2026-03-24 20:48:10,436 | INFO | GOOGL FIFO result realized=57.00, remaining=2.0
+2026-03-24 20:48:10,437 | INFO | Total unrealized P&L: 2032.96
+2026-03-24 20:49:05,803 | INFO | Trade with ID 7 deleted successfully.
+2026-03-24 20:49:37,311 | INFO | Calculating total unrealized P&L
+2026-03-24 20:49:37,312 | INFO | Calculating unrealized P&L for AAPL
+2026-03-24 20:49:37,312 | INFO | Calculating FIFO P&L for AAPL
+2026-03-24 20:49:37,313 | INFO | Fetching trades for AAPL
+2026-03-24 20:49:37,313 | INFO | AAPL FIFO result realized=88.70, remaining=12.0
+2026-03-24 20:49:37,314 | INFO | Calculating unrealized P&L for MSFT
+2026-03-24 20:49:37,314 | INFO | Calculating FIFO P&L for MSFT
+2026-03-24 20:49:37,315 | INFO | Fetching trades for MSFT
+2026-03-24 20:49:37,315 | INFO | MSFT FIFO result realized=0.00, remaining=12.0
+2026-03-24 20:49:37,316 | INFO | Calculating unrealized P&L for GOOGL
+2026-03-24 20:49:37,317 | INFO | Calculating FIFO P&L for GOOGL
+2026-03-24 20:49:37,317 | INFO | Fetching trades for GOOGL
+2026-03-24 20:49:37,318 | INFO | GOOGL FIFO result realized=0.00, remaining=4.0
+2026-03-24 20:49:37,319 | INFO | Total unrealized P&L: 2128.44
+2026-03-24 20:49:37,319 | INFO | Calculating total realized P&L
+2026-03-24 20:49:37,320 | INFO | Calculating FIFO P&L for AAPL
+2026-03-24 20:49:37,320 | INFO | Fetching trades for AAPL
+2026-03-24 20:49:37,321 | INFO | AAPL FIFO result realized=88.70, remaining=12.0
+2026-03-24 20:49:37,321 | INFO | Calculating FIFO P&L for MSFT
+2026-03-24 20:49:37,321 | INFO | Fetching trades for MSFT
+2026-03-24 20:49:37,322 | INFO | MSFT FIFO result realized=0.00, remaining=12.0
+2026-03-24 20:49:37,322 | INFO | Calculating FIFO P&L for GOOGL
+2026-03-24 20:49:37,323 | INFO | Fetching trades for GOOGL
+2026-03-24 20:49:37,323 | INFO | GOOGL FIFO result realized=0.00, remaining=4.0
+2026-03-24 20:49:37,324 | INFO | Total realized P&L: 88.70
+2026-03-24 20:49:42,059 | INFO | Calculating total unrealized P&L
+2026-03-24 20:49:42,060 | INFO | Calculating unrealized P&L for AAPL
+2026-03-24 20:49:42,061 | INFO | Calculating FIFO P&L for AAPL
+2026-03-24 20:49:42,061 | INFO | Fetching trades for AAPL
+2026-03-24 20:49:42,062 | INFO | AAPL FIFO result realized=88.70, remaining=12.0
+2026-03-24 20:49:42,063 | INFO | Calculating unrealized P&L for MSFT
+2026-03-24 20:49:42,063 | INFO | Calculating FIFO P&L for MSFT
+2026-03-24 20:49:42,063 | INFO | Fetching trades for MSFT
+2026-03-24 20:49:42,064 | INFO | MSFT FIFO result realized=0.00, remaining=12.0
+2026-03-24 20:49:42,064 | INFO | Calculating unrealized P&L for GOOGL
+2026-03-24 20:49:42,065 | INFO | Calculating FIFO P&L for GOOGL
+2026-03-24 20:49:42,065 | INFO | Fetching trades for GOOGL
+2026-03-24 20:49:42,066 | INFO | GOOGL FIFO result realized=0.00, remaining=4.0
+2026-03-24 20:49:42,067 | INFO | Total unrealized P&L: 2128.44
+2026-03-24 20:49:42,067 | INFO | Calculating total realized P&L
+2026-03-24 20:49:42,068 | INFO | Calculating FIFO P&L for AAPL
+2026-03-24 20:49:42,069 | INFO | Fetching trades for AAPL
+2026-03-24 20:49:42,069 | INFO | AAPL FIFO result realized=88.70, remaining=12.0
+2026-03-24 20:49:42,070 | INFO | Calculating FIFO P&L for MSFT
+2026-03-24 20:49:42,070 | INFO | Fetching trades for MSFT
+2026-03-24 20:49:42,071 | INFO | MSFT FIFO result realized=0.00, remaining=12.0
+2026-03-24 20:49:42,071 | INFO | Calculating FIFO P&L for GOOGL
+2026-03-24 20:49:42,071 | INFO | Fetching trades for GOOGL
+2026-03-24 20:49:42,072 | INFO | GOOGL FIFO result realized=0.00, remaining=4.0
+2026-03-24 20:49:42,072 | INFO | Total realized P&L: 88.70
+2026-03-24 20:49:50,288 | INFO | Calculating total realized P&L
+2026-03-24 20:49:50,289 | INFO | Calculating FIFO P&L for AAPL
+2026-03-24 20:49:50,289 | INFO | Fetching trades for AAPL
+2026-03-24 20:49:50,290 | INFO | AAPL FIFO result realized=88.70, remaining=12.0
+2026-03-24 20:49:50,290 | INFO | Calculating FIFO P&L for MSFT
+2026-03-24 20:49:50,291 | INFO | Fetching trades for MSFT
+2026-03-24 20:49:50,292 | INFO | MSFT FIFO result realized=0.00, remaining=12.0
+2026-03-24 20:49:50,292 | INFO | Calculating FIFO P&L for GOOGL
+2026-03-24 20:49:50,292 | INFO | Fetching trades for GOOGL
+2026-03-24 20:49:50,293 | INFO | GOOGL FIFO result realized=0.00, remaining=4.0
+2026-03-24 20:49:50,294 | INFO | Total realized P&L: 88.70
+2026-03-24 20:49:53,336 | INFO | Calculating total unrealized P&L
+2026-03-24 20:49:53,336 | INFO | Calculating unrealized P&L for AAPL
+2026-03-24 20:49:53,336 | INFO | Calculating FIFO P&L for AAPL
+2026-03-24 20:49:53,338 | INFO | Fetching trades for AAPL
+2026-03-24 20:49:53,338 | INFO | AAPL FIFO result realized=88.70, remaining=12.0
+2026-03-24 20:49:53,339 | INFO | Calculating unrealized P&L for MSFT
+2026-03-24 20:49:53,339 | INFO | Calculating FIFO P&L for MSFT
+2026-03-24 20:49:53,339 | INFO | Fetching trades for MSFT
+2026-03-24 20:49:53,340 | INFO | MSFT FIFO result realized=0.00, remaining=12.0
+2026-03-24 20:49:53,341 | INFO | Calculating unrealized P&L for GOOGL
+2026-03-24 20:49:53,341 | INFO | Calculating FIFO P&L for GOOGL
+2026-03-24 20:49:53,342 | INFO | Fetching trades for GOOGL
+2026-03-24 20:49:53,342 | INFO | GOOGL FIFO result realized=0.00, remaining=4.0
+2026-03-24 20:49:53,343 | INFO | Total unrealized P&L: 2128.44

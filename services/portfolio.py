@@ -4,13 +4,26 @@ from services.stock import get_latest_price
 
 logger = setup_logger()
 
-def log_trade(ticker, date, action, quantity, price, commission=0, currency='EUR', note=None):
+def log_trade(**trade):
     with get_connection() as conn:
         conn.execute("""
-                     INSERT INTO transactions (ticker, date, action, quantity, price, commission, currency, note)
-                     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                     """, (ticker, date, action.upper(), quantity, price, commission, currency, note))
-    logger.info(f"Trade logged: {action} {quantity} {ticker} @ {price}")
+            INSERT INTO transactions
+            (ticker, date, action, quantity, price, commission, currency, note)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            trade["ticker"],
+            trade["date"],
+            trade["action"].upper(),
+            trade["quantity"],
+            trade["price"],
+            trade.get("commission", 0),
+            trade.get("currency", "EUR"),
+            trade.get("note")
+        ))
+
+    logger.info(
+        f"Trade logged: {trade['action']} {trade['quantity']} {trade['ticker']} @ {trade['price']}"
+    )
 
 def calculate_holdings():
     with get_connection() as conn:

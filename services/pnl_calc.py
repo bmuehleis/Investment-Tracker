@@ -61,8 +61,6 @@ def convert_to_base_currency(amount, currency, base_currency='EUR'):
 # FIFO CORE ENGINE
 # =========================
 def calculate_fifo_pnl(ticker):
-    logger.info(f"Calculating FIFO P&L for {ticker}")
-
     trades = get_trades(ticker)
 
     buy_queue = []
@@ -76,8 +74,6 @@ def calculate_fifo_pnl(ticker):
             commission = convert_to_base_currency(trade["commission"], trade["currency"])
 
             if action == 'BUY':
-                logger.debug(f"BUY {quantity} @ {price}")
-
                 buy_queue.append({
                     "shares": quantity,
                     "price": price,
@@ -85,8 +81,6 @@ def calculate_fifo_pnl(ticker):
                 })
 
             elif action == 'SELL':
-                logger.debug(f"SELL {quantity} @ {price}")
-
                 remaining = quantity
 
                 while remaining > 0 and buy_queue:
@@ -103,11 +97,6 @@ def calculate_fifo_pnl(ticker):
 
                     pnl = sell_value - cost_basis
                     realized_pnl += pnl
-
-                    logger.debug(
-                        f"Matched {used} shares | cost={cost_basis:.2f} | "
-                        f"sell={sell_value:.2f} | pnl={pnl:.2f}"
-                    )
 
                     lot["shares"] -= used
                     remaining -= used
@@ -143,8 +132,6 @@ def calculate_fifo_pnl(ticker):
 # AVERAGE PRICE
 # =========================
 def calculate_average_price(ticker):
-    logger.info(f"Calculating average price for {ticker}")
-
     data = calculate_fifo_pnl(ticker)
     total_shares = data["remaining_shares"]
 
@@ -157,8 +144,6 @@ def calculate_average_price(ticker):
     )
 
     avg_price = total_cost / total_shares
-
-    logger.debug(f"{ticker} avg price: {avg_price:.2f}")
     return avg_price
 
 
@@ -166,8 +151,6 @@ def calculate_average_price(ticker):
 # UNREALIZED P&L
 # =========================
 def calculate_unrealized_pnl(ticker):
-    logger.info(f"Calculating unrealized P&L for {ticker}")
-
     try:
         data = calculate_fifo_pnl(ticker)
         current_price = get_latest_price(ticker)
@@ -184,7 +167,6 @@ def calculate_unrealized_pnl(ticker):
             pnl = (current_price - lot["price"]) * lot["shares"]
             unrealized += pnl
 
-        logger.debug(f"{ticker} unrealized P&L: {unrealized:.2f}")
         return unrealized
 
     except Exception as e:
@@ -196,8 +178,6 @@ def calculate_unrealized_pnl(ticker):
 # PORTFOLIO TOTALS
 # =========================
 def calculate_total_unrealized_pnl():
-    logger.info("Calculating total unrealized P&L")
-
     total = 0.0
 
     for ticker in get_all_tickers():
@@ -208,8 +188,6 @@ def calculate_total_unrealized_pnl():
 
 
 def calculate_total_realized_pnl():
-    logger.info("Calculating total realized P&L")
-
     total = 0.0
 
     for ticker in get_all_tickers():

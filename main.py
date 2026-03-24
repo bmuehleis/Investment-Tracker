@@ -1,4 +1,5 @@
 from config import TICKERS
+import uvicorn
 from db.database import create_tables
 from services.portfolio import (
     log_trade, 
@@ -52,4 +53,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    uvicorn.run("api.api:app", host="127.0.0.1", port=8000, reload=True)

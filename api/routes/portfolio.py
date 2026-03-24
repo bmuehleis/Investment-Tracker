@@ -10,3 +10,7 @@ def unrealized():
 @router.get("/realized")
 def realized():
     return {"realized": calculate_total_realized_pnl()}
+
+@router.get("/total")
+def total():
+    return {"total": calculate_total_unrealized_pnl() + calculate_total_realized_pnl()}
