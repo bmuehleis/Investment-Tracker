@@ -1,0 +1,17 @@
+2026-03-23 20:39:18,212 | INFO | Fetching AAPL...
+2026-03-23 20:39:18,652 | INFO | AAPL updated successfully
+2026-03-23 20:39:18,653 | INFO | Fetching MSFT...
+2026-03-23 20:39:18,787 | INFO | MSFT updated successfully
+2026-03-23 20:39:18,789 | INFO | Fetching GOOGL...
+2026-03-23 20:39:18,902 | INFO | GOOGL updated successfully
+2026-03-23 20:39:18,903 | INFO | Inserting test trades...
+2026-03-23 20:39:18,908 | INFO | Trade logged: BUY 10 AAPL @ 150.0
+2026-03-23 20:39:18,912 | INFO | Trade logged: BUY 5 AAPL @ 170.0
+2026-03-23 20:39:18,916 | INFO | Trade logged: SELL 3 AAPL @ 180.0
+2026-03-23 20:39:18,922 | INFO | Trade logged: BUY 8 MSFT @ 300.0
+2026-03-23 20:39:18,927 | INFO | Trade logged: BUY 4 MSFT @ 320.0
+2026-03-23 20:39:18,928 | INFO | Trade test complete
+2026-03-23 20:39:18,930 | INFO | Calculating portfolio value...
+2026-03-23 20:39:18,931 | INFO | AAPL: 12.0 sharex x 252.10 = 3025.20
+2026-03-23 20:39:18,931 | INFO | MSFT: 12.0 sharex x 383.30 = 4599.60
+2026-03-23 20:39:18,932 | INFO | TOTAL VALUE: 7624.80
