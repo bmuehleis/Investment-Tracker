@@ -36,6 +36,7 @@ def get_latest_price(ticker):
     return float(result[0]) if result else None
 
 
+
 # -------------------------
 # WRITE
 # -------------------------

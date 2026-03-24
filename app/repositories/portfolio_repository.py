@@ -35,6 +35,26 @@ def get_latest_price(ticker):
 
     return float(result[0]) if result else None
 
+def get_ticker_holdings(ticker):
+    with get_connection() as conn:
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            SELECT action, quantity
+            FROM transactions
+            WHERE ticker = ?
+        """, (ticker,))
+
+        rows = cursor.fetchall()
+
+    holdings = 0.0
+    for action, quantity in rows:
+        if action.upper() == "BUY":
+            holdings += float(quantity)
+        elif action.upper() == "SELL":
+            holdings -= float(quantity)
+
+    return holdings
 
 # -------------------------
 # WRITE
