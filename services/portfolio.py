@@ -24,6 +24,50 @@ def calculate_holdings():
                        """)    
     return {row[0]: row[1] for row in cursor.fetchall()}
 
+def delete_trade(trade_id):
+    try:
+        with get_connection() as conn:
+            cursor = conn.cursor()
+            
+            cursor.execute("""
+                           DELETE FROM transactions
+                           WHERE id = ?
+                           """, (trade_id,))
+            
+            conn.commit()
+            
+        logger.info(f"Trade with ID {trade_id} deleted successfully.")
+    except Exception as e:
+        logger.error(f"Error deleting trade with ID {trade_id}: {e}")
+
+def edit_trade(trade_id, **fields):
+    try: 
+        allowed_fields = ['date', 'action', 'quantity', 'price', 'commission', 'currency', 'note']
+        
+        updates = []
+        values = []
+        
+        for key, value in fields.item():
+            if key in allowed_fields:
+                updates.append(f"{key} = ?")
+                values.append(value)
+        
+        values.append(trade_id)
+        
+        with get_connection() as conn:
+            cursor = conn.cursor()
+            
+            cursor.execute(f"""
+                           UPDATE transactions
+                           SET {', '.join(updates)}
+                           WHERE id = ?
+                           """, values)
+            conn.commit()
+        logger.info(f"Trade with ID {trade_id} updated successfully.")
+    except Exception as e:
+        logger.error(f"Error updating trade with ID {trade_id}: {e}")
+
+
 def calculate_portfolio_value():
     holdings = calculate_holdings()
     
