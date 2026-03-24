@@ -28,8 +28,8 @@ def create_tables():
                          action TEXT NOT NULL,
                          quantity REAL NOT NULL,
                          price REAL NOT NULL,
-                         currency TEXT NOT NULL DEFAULT EUR,
                          commission REAL DEFAULT 0,
+                         currency TEXT NOT NULL DEFAULT 'EUR',
                          note TEXT
                          )
                          """)
