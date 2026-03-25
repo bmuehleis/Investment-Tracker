@@ -7,7 +7,7 @@ from app.repositories.trades_repository import (
     edit_trade
 )
 
-router = APIRouter(prefix="/trades", tags=["Trades"])
+router = APIRouter(tags=["Trades"])
 
 @router.get("/")
 def list_trades():

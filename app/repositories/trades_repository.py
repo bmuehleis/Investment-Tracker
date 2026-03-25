@@ -1,5 +1,6 @@
 from app.core.database import get_connection
 from app.core.logger import setup_logger
+import sqlite3
 
 logger = setup_logger()
 
@@ -136,9 +137,13 @@ def get_trades_by_ticker(ticker):
 def get_all_trades():
     try:
         with get_connection() as conn:
+            conn.row_factory = sqlite3.Row
             cursor = conn.cursor()
+
             cursor.execute("SELECT * FROM transactions ORDER BY date DESC")
-            return cursor.fetchall()
+            rows = cursor.fetchall()
+
+            return [dict(row) for row in rows]
 
     except Exception as e:
         logger.error(f"Error fetching all trades: {e}")

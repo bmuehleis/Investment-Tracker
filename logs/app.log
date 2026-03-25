@@ -27,3 +27,45 @@
 2026-03-24 22:42:21,549 | INFO | Trade logged: BUY 4.0 F50A.DE @ 25.255
 2026-03-24 22:42:39,744 | INFO | Trade logged: BUY 2.0 F50A.DE @ 28.105
 2026-03-24 22:43:11,346 | INFO | Trade logged: SELL 69.0 F50A.DE @ 33.25
+2026-03-25 12:02:30,470 | INFO | Starting initial data sync...
+2026-03-25 12:02:30,471 | INFO | Fetching CL2.PA...
+2026-03-25 12:02:32,465 | INFO | CL2.PA updated successfully
+2026-03-25 12:02:32,466 | INFO | Fetching F50A.DE...
+2026-03-25 12:02:32,570 | INFO | F50A.DE updated successfully
+2026-03-25 12:02:32,570 | INFO | Initial sync completed.
+2026-03-25 12:04:35,677 | INFO | Starting initial data sync...
+2026-03-25 12:04:35,679 | INFO | CL2.PA already up to date
+2026-03-25 12:04:35,679 | INFO | F50A.DE already up to date
+2026-03-25 12:04:35,680 | INFO | Initial sync completed.
+2026-03-25 12:06:53,761 | INFO | Starting initial data sync...
+2026-03-25 12:06:53,762 | INFO | CL2.PA already up to date
+2026-03-25 12:06:53,763 | INFO | F50A.DE already up to date
+2026-03-25 12:06:53,763 | INFO | Initial sync completed.
+2026-03-25 12:07:58,986 | INFO | Starting initial data sync...
+2026-03-25 12:07:58,987 | INFO | CL2.PA already up to date
+2026-03-25 12:07:58,988 | INFO | F50A.DE already up to date
+2026-03-25 12:07:58,988 | INFO | Initial sync completed.
+2026-03-25 12:09:09,878 | INFO | Starting initial data sync...
+2026-03-25 12:09:09,879 | INFO | CL2.PA already up to date
+2026-03-25 12:09:09,880 | INFO | F50A.DE already up to date
+2026-03-25 12:09:09,880 | INFO | Initial sync completed.
+2026-03-25 12:11:38,471 | INFO | Starting initial data sync...
+2026-03-25 12:11:38,472 | INFO | CL2.PA already up to date
+2026-03-25 12:11:38,473 | INFO | F50A.DE already up to date
+2026-03-25 12:11:38,473 | INFO | Initial sync completed.
+2026-03-25 12:13:02,366 | INFO | Starting initial data sync...
+2026-03-25 12:13:02,367 | INFO | CL2.PA already up to date
+2026-03-25 12:13:02,368 | INFO | F50A.DE already up to date
+2026-03-25 12:13:02,368 | INFO | Initial sync completed.
+2026-03-25 12:14:38,424 | INFO | Starting initial data sync...
+2026-03-25 12:14:38,425 | INFO | CL2.PA already up to date
+2026-03-25 12:14:38,425 | INFO | F50A.DE already up to date
+2026-03-25 12:14:38,426 | INFO | Initial sync completed.
+2026-03-25 12:18:02,918 | INFO | Starting initial data sync...
+2026-03-25 12:18:02,919 | INFO | CL2.PA already up to date
+2026-03-25 12:18:02,920 | INFO | F50A.DE already up to date
+2026-03-25 12:18:02,920 | INFO | Initial sync completed.
+2026-03-25 12:18:42,721 | INFO | Starting initial data sync...
+2026-03-25 12:18:42,722 | INFO | CL2.PA already up to date
+2026-03-25 12:18:42,723 | INFO | F50A.DE already up to date
+2026-03-25 12:18:42,723 | INFO | Initial sync completed.

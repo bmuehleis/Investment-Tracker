@@ -1,9 +1,9 @@
-import uvicorn
+#Next Steps: Ticker Liste modular + Watchlist; Front-End HTML + JS
 
+import uvicorn
 from app.core.config import TICKERS
 from app.core.logger import setup_logger
 from app.core.database import create_tables
-
 from app.services.stock_service import update_ticker
 
 logger = setup_logger()
