@@ -1,22 +1,136 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Investment Tracker</title>
-    <link rel="stylesheet" href="/static/css/style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Investment Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css" />
 </head>
 <body>
 
-    <h1>Investment Tracker</h1>
+  <header class="topbar">
+    <div class="logo">◈ Investment Tracker</div>
+    <nav>
+      <button class="nav-btn active" data-tab="dashboard">Dashboard</button>
+      <button class="nav-btn" data-tab="trades">Trades</button>
+      <button class="nav-btn" data-tab="add">+ Add Trade</button>
+      <button class="nav-btn" data-tab="watchlist">Watchlist</button>
+      <button class="nav-btn" data-tab="analytics">Analytics</button>
+    </nav>
+  </header>
 
-    <div>
-        <input id="ticker" placeholder="Ticker (e.g. AAPL)">
-        <input id="amount" placeholder="Amount" type="number">
-        <button onclick="addTrade()">Add Trade</button>
-    </div>
+  <!-- DASHBOARD TAB -->
+  <main id="tab-dashboard" class="tab active">
+    <section class="summary-cards">
+      <div class="card">
+        <div class="card-label">Total Invested</div>
+        <div class="card-value mono" id="total-invested">—</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Open Positions</div>
+        <div class="card-value mono" id="open-positions">—</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Total Trades</div>
+        <div class="card-value mono" id="total-trades">—</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Last Ticker</div>
+        <div class="card-value mono" id="last-trade">—</div>
+      </div>
+    </section>
 
-    <h2>Trades</h2>
-    <ul id="trade-list"></ul>
+    <section class="section">
+      <div class="section-header">
+        <h2>Recent Trades</h2>
+        <button class="btn-secondary" id="btn-refresh">↻ Refresh</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Ticker</th>
+              <th>Type</th>
+              <th>Quantity</th>
+              <th>Price (€)</th>
+              <th>Total (€)</th>
+            </tr>
+          </thead>
+          <tbody id="dashboard-body">
+            <tr><td colspan="5" class="empty">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
 
-    <script src="/static/js/app.js"></script>
+  <!-- TRADES TAB -->
+  <main id="tab-trades" class="tab">
+    <section class="section">
+      <h2>All Trades</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Ticker</th>
+              <th>Type</th>
+              <th>Quantity</th>
+              <th>Price (€)</th>
+              <th>Total (€)</th>
+            </tr>
+          </thead>
+          <tbody id="trades-body">
+            <tr><td colspan="5" class="empty">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <!-- ADD TRADE TAB -->
+  <main id="tab-add" class="tab">
+    <section class="section form-section">
+      <h2>Log a Trade</h2>
+      <form id="add-form" autocomplete="off">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Ticker Symbol</label>
+            <input type="text" id="f-ticker" placeholder="e.g. AAPL, TSLA" required />
+          </div>
+          <div class="form-group">
+            <label>Amount (€)</label>
+            <input type="number" id="f-amount" placeholder="0.00" step="any" min="0.0001" required />
+          </div>
+        </div>
+        <div class="form-preview" id="trade-preview"></div>
+        <div class="form-actions">
+          <button type="submit" class="btn-primary">Save Trade</button>
+        </div>
+        <div id="form-msg"></div>
+      </form>
+    </section>
+  </main>
+
+  <!-- WATCHLIST TAB -->
+  <main id="tab-watchlist" class="tab">
+    <section class="section placeholder-section">
+      <h2>Watchlist</h2>
+      <p class="placeholder-text">Track tickers you're watching before investing. Coming soon.</p>
+    </section>
+  </main>
+
+  <!-- ANALYTICS TAB -->
+  <main id="tab-analytics" class="tab">
+    <section class="section placeholder-section">
+      <h2>Analytics</h2>
+      <p class="placeholder-text">Performance metrics, sector breakdowns, and charts. Coming soon.</p>
+    </section>
+  </main>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="/static/js/app.js"></script>
 </body>
 </html>
