@@ -29,9 +29,15 @@ A simple application to track and manage your investment portfolio.
 python main.py
 ```
 
-## Contributing
+## Third-Party Libraries / APIs
 
-Contributions are welcome. Please fork the repository and submit a pull request.
+This project uses the following external APIs:
+
+- [yfinance](https://github.com/ranaroussi/yfinance) - Provides stock data  
+  Licensed under the Apache License 2.0. Copyright Ran Aroussi
+
+- [Frankfurter](https://github.com/lineofflight/frankfurter) - Currency exchange rates API  
+  Licensed under the MIT License. Copyright (c) Patrick Line
 
 ## License
 
