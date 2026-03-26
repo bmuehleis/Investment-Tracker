@@ -35,4 +35,6 @@ Contributions are welcome. Please fork the repository and submit a pull request.
 
 ## License
 
-This project is licensed under the MIT License.
+This project is licensed under the GNU General Public License v3.0.
+
+You are free to use, modify, and distribute this software, provided that any derivative work is also licensed under the GPL v3.0.
