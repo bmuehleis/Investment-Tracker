@@ -33,3 +33,12 @@ def create_tables():
                          note TEXT
                          )
                          """)
+        
+        conn.execute("""
+                     CREATE TABLE IF NOT EXISTS fx_rates (
+                         pair TEXT PRIMARY KEY,
+                         rate REAL NOT NULL,
+                         provider TEXT,
+                         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                         )
+                         """)

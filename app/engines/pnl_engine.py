@@ -3,7 +3,6 @@
 from app.core.logger import setup_logger
 from app.services.stock_service import get_latest_price
 from app.repositories.trades_repository import get_trades_by_ticker, get_all_tickers
-from app.utils.currency import convert_to_base_currency
 
 logger = setup_logger()
 
@@ -21,8 +20,9 @@ def calculate_fifo_pnl(ticker: str):
         action = trade["action"]
         quantity = float(trade["quantity"])
 
-        price = convert_to_base_currency(trade["price"], trade["currency"])
-        commission = convert_to_base_currency(trade["commission"], trade["currency"])
+        #TODO: ADD CURRENCY CONVERSION LATER
+        price = trade["price"]
+        commission = trade["commission"]
 
         if action == "BUY":
             buy_queue.append({
