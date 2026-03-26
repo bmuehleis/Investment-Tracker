@@ -43,8 +43,13 @@ A personal investment tracking application built to run with a fully self-manage
 ### Installation
 1. Clone the repository  
 2. Install dependencies:
+   
    ```bash
    pip install -r requirements.txt
+4. Run the application:
+   
+   ```bash
+   py main.py
 
 ---
 
