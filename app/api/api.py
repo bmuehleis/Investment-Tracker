@@ -3,9 +3,9 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from pathlib import Path
-from app.api.routes.trades import router as trades_router
-from app.api.routes.portfolio import router as portfolio_router
-from app.api.routes.positions import router as positions_router
+from app.api.routes.trades_routes import router as trades_router
+from app.api.routes.portfolio_routes import router as portfolio_router
+from app.api.routes.position_routes import router as positions_router
 
 
 app = FastAPI(

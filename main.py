@@ -3,7 +3,6 @@ from app.core.config import TICKERS
 from app.core.logger import setup_logger
 from app.core.database import create_tables
 from app.services.stock_service import update_ticker
-from app.utils.currency import convert_currency_api
 
 logger = setup_logger()
 

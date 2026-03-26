@@ -9,6 +9,77 @@
 
 let API = localStorage.getItem("api_url") || "http://127.0.0.1:8000/api/v1";
 
+// ── Preferred currency ────────────────────────────────────
+// Stored in localStorage as "preferred_currency" (e.g. "EUR", "USD", "GBP")
+let PREFERRED_CURRENCY = localStorage.getItem("preferred_currency") || "EUR";
+
+// ── FX rate cache ─────────────────────────────────────────
+// Structure: { "USD->EUR": { rate: 0.92, date: "2024-06-01" }, ... }
+// Persisted to localStorage under key "fx_cache" so it survives page reloads.
+// On each app start we load the persisted cache; stale entries (not today's date)
+// are simply ignored and re-fetched on demand.
+
+const FX_CACHE_KEY = "fx_cache";
+let _fxCache = (() => {
+  try { return JSON.parse(localStorage.getItem(FX_CACHE_KEY)) || {}; }
+  catch { return {}; }
+})();
+
+function _saveFxCache() {
+  try { localStorage.setItem(FX_CACHE_KEY, JSON.stringify(_fxCache)); } catch {}
+}
+
+function _todayStr() {
+  return new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
+}
+
+/**
+ * Returns the FX rate to convert 1 unit of `from` into `to`.
+ * - Returns 1 immediately if from === to.
+ * - Checks the in-memory + localStorage cache first (date-keyed, 1d TTL).
+ * - Falls back to the free Frankfurter API (https://api.frankfurter.app).
+ * - On network failure returns null so callers can show "—" gracefully.
+ */
+async function getFxRate(from, to) {
+  if (!from || !to || from.toUpperCase() === to.toUpperCase()) return 1;
+
+  const key   = `${from.toUpperCase()}->${to.toUpperCase()}`;
+  const today = _todayStr();
+
+  // Cache hit?
+  if (_fxCache[key] && _fxCache[key].date === today) {
+    return _fxCache[key].rate;
+  }
+
+  try {
+    const res = await fetch(
+      `https://api.frankfurter.app/latest?from=${from.toUpperCase()}&to=${to.toUpperCase()}`
+    );
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    const rate = data.rates?.[to.toUpperCase()];
+    if (rate == null) throw new Error("Rate missing in response");
+
+    _fxCache[key] = { rate, date: today };
+    _saveFxCache();
+    return rate;
+  } catch (err) {
+    console.warn(`FX fetch failed (${key}):`, err.message);
+    return null;
+  }
+}
+
+/**
+ * Converts `amount` from `fromCurrency` to PREFERRED_CURRENCY.
+ * Returns null if conversion is impossible.
+ */
+async function toPreferred(amount, fromCurrency) {
+  if (amount === null || amount === undefined || isNaN(amount)) return null;
+  const rate = await getFxRate(fromCurrency, PREFERRED_CURRENCY);
+  if (rate === null) return null;
+  return amount * rate;
+}
+
 // ── Helpers ──────────────────────────────────────────────
 
 function fmt(value, decimals = 2) {
@@ -32,6 +103,13 @@ function gainClass(val) {
 
 function gainPrefix(val) {
   return (!val || isNaN(val)) ? "" : val > 0 ? "+" : "";
+}
+
+/** Formats a monetary value with sign prefix and currency symbol suffix: "+1,234.56€" */
+function fmtMoney(val, decimals = 2) {
+  if (val === null || val === undefined || isNaN(val)) return "—";
+  const symbol = { EUR: "€", USD: "$", GBP: "£", CHF: "CHF", JPY: "¥" }[PREFERRED_CURRENCY] ?? PREFERRED_CURRENCY;
+  return `${gainPrefix(val)}${fmt(Math.abs(val), decimals)}${symbol}`;
 }
 
 function showToast(msg) {
@@ -70,6 +148,7 @@ const settingsModal = document.getElementById("settings-modal");
 
 document.getElementById("btn-settings").addEventListener("click", () => {
   document.getElementById("setting-api-url").value = API;
+  document.getElementById("setting-currency").value = PREFERRED_CURRENCY;
   settingsModal.style.display = "flex";
 });
 
@@ -84,6 +163,17 @@ settingsModal.addEventListener("click", e => {
 document.getElementById("btn-save-settings").addEventListener("click", () => {
   const newUrl = document.getElementById("setting-api-url").value.trim().replace(/\/$/, "");
   if (newUrl) { API = newUrl; localStorage.setItem("api_url", API); }
+
+  // ── Currency preference ──
+  const newCurrency = (document.getElementById("setting-currency")?.value || "EUR").trim().toUpperCase();
+  if (newCurrency && newCurrency !== PREFERRED_CURRENCY) {
+    PREFERRED_CURRENCY = newCurrency;
+    localStorage.setItem("preferred_currency", PREFERRED_CURRENCY);
+    // Reload dashboard so all values are re-converted to the new currency
+    const active = document.querySelector(".tab.active")?.id?.replace("tab-", "");
+    if (active === "dashboard" || !active) loadDashboard();
+  }
+
   settingsModal.style.display = "none";
   showToast("Settings saved.");
 });
@@ -133,7 +223,6 @@ async function loadDashboard() {
   try {
     const gains = await fetchGains();
 
-    // Helper to extract a numeric value from various response shapes
     const extractVal = (obj, ...keys) => {
       if (obj === null || obj === undefined) return null;
       for (const k of keys) {
@@ -143,44 +232,80 @@ async function loadDashboard() {
       return null;
     };
 
+    // Raw values (assumed to come from API in their own currency —
+    // the API doesn't tell us the currency so we treat them as already
+    // in the base account currency stored in PREFERRED_CURRENCY.
+    // If your API returns a currency field you can extend this logic.)
     const unrealVal = extractVal(gains.unrealized, "unrealized_gains", "value", "unrealized", "gains");
     const realVal   = extractVal(gains.realized,   "realized_gains",   "value", "realized",   "gains");
     const totalVal  = extractVal(gains.total,       "total_gains",      "value", "total",      "gains");
 
-    // Portfolio value: fall back to fetching trades if no endpoint
+    // API gain currency — extend this if your API exposes it
+    const apiCurrency = gains.unrealized?.currency || gains.realized?.currency || gains.total?.currency || PREFERRED_CURRENCY;
+
+    // Convert gains to preferred currency (will be a no-op if already matching)
+    const [unrealConv, realConv, totalConv] = await Promise.all([
+      unrealVal !== null ? toPreferred(unrealVal, apiCurrency) : Promise.resolve(null),
+      realVal   !== null ? toPreferred(realVal,   apiCurrency) : Promise.resolve(null),
+      totalVal  !== null ? toPreferred(totalVal,  apiCurrency) : Promise.resolve(null),
+    ]);
+
+    // Portfolio value derived from trades
     let portfolioVal = null;
     try {
       const trades = await fetchTrades();
 
-      const invested = trades
-        .filter(t => (t.action || "buy").toLowerCase() === "buy")
-        .reduce((s, t) => s + (t.quantity ?? 0) * (t.price ?? 0), 0);
+      // Sum cost basis per currency then convert each bucket
+      const buckets = {};
+      for (const t of trades) {
+        if ((t.action || "buy").toLowerCase() !== "buy") continue;
+        const cur = (t.currency || PREFERRED_CURRENCY).toUpperCase();
+        buckets[cur] = (buckets[cur] || 0) + (t.quantity ?? 0) * (t.price ?? 0);
+      }
 
-      portfolioVal = invested + (unrealVal ?? 0);
+      let invested = 0;
+      for (const [cur, amount] of Object.entries(buckets)) {
+        const converted = await toPreferred(amount, cur);
+        if (converted !== null) invested += converted;
+      }
+
+      portfolioVal = invested + (unrealConv ?? 0);
     } catch {}
 
-    const setCard = (id, subId, val) => {
+    const setCard = (id, subId, val, basisForPct = null) => {
       const el    = document.getElementById(id);
       const subEl = document.getElementById(subId);
       if (val === null) {
-        el.textContent  = "—";
-        el.className    = "card-value mono";
-        subEl.textContent = "Not available";
+        el.textContent    = "—";
+        el.className      = "card-value mono";
+        subEl.textContent = "—";
         subEl.className   = "card-sub";
         return;
       }
-      el.textContent  = `€ ${gainPrefix(val)}${fmt(Math.abs(val))}`;
-      el.className    = `card-value mono ${val > 0 ? "positive" : val < 0 ? "negative" : ""}`;
-      subEl.className = `card-sub ${val > 0 ? "positive" : val < 0 ? "negative" : ""}`;
-      subEl.textContent = val > 0 ? "▲ Positive" : val < 0 ? "▼ Negative" : "Breakeven";
+      el.textContent = fmtMoney(val);
+      el.className   = `card-value mono ${val > 0 ? "positive" : val < 0 ? "negative" : ""}`;
+
+      // Show return % when we have a meaningful cost basis, otherwise fall back to a plain sign label
+      let subText = val > 0 ? "▲ —" : val < 0 ? "▼ —" : "—";
+      if (basisForPct !== null && basisForPct !== 0) {
+        const pct    = (val / Math.abs(basisForPct)) * 100;
+        const prefix = pct > 0 ? "▲ +" : pct < 0 ? "▼ " : "";
+        subText = `${prefix}${fmt(Math.abs(pct), 2)}%`;
+      }
+      subEl.textContent = subText;
+      subEl.className   = `card-sub ${val > 0 ? "positive" : val < 0 ? "negative" : ""}`;
     };
 
-    document.getElementById("portfolio-value").textContent = portfolioVal !== null ? `€ ${fmt(portfolioVal)}` : "—";
-    document.getElementById("portfolio-value").className   = "card-value mono";
+    document.getElementById("portfolio-value").textContent =
+      portfolioVal !== null ? fmtMoney(portfolioVal) : "—";
+    document.getElementById("portfolio-value").className = "card-value mono";
 
-    setCard("unrealised-gains", "unrealised-gains-sub", unrealVal);
-    setCard("realised-gains",   "realised-gains-sub",   realVal);
-    setCard("total-gains",      "total-gains-sub",      totalVal);
+    // For each card the "basis" is the invested cost so the % reads as gain-on-cost.
+    // portfolioVal already includes unrealConv, so cost = portfolioVal - unrealConv.
+    const costBasis = (portfolioVal !== null && unrealConv !== null) ? portfolioVal - unrealConv : null;
+    setCard("unrealised-gains", "unrealised-gains-sub", unrealConv, costBasis);
+    setCard("realised-gains",   "realised-gains-sub",   realConv,   costBasis);
+    setCard("total-gains",      "total-gains-sub",      totalConv,  costBasis);
 
   } catch (e) {
     console.error("Gains load error:", e);
@@ -198,7 +323,8 @@ async function loadDashboard() {
       posBody.innerHTML = `<tr><td colspan="8" class="empty">No open positions.</td></tr>`;
       return;
     }
-    posBody.innerHTML = positions.map(buildPositionRow).join("");
+    const rows = await Promise.all(positions.map(buildPositionRow));
+    posBody.innerHTML = rows.join("");
   } catch (e) {
     // Fallback: derive open positions from trades
     try {
@@ -207,7 +333,8 @@ async function loadDashboard() {
       if (!derived.length) {
         posBody.innerHTML = `<tr><td colspan="8" class="empty">No open positions.</td></tr>`;
       } else {
-        posBody.innerHTML = derived.map(buildPositionRow).join("");
+        const rows = await Promise.all(derived.map(buildPositionRow));
+        posBody.innerHTML = rows.join("");
       }
     } catch {
       posBody.innerHTML = `<tr><td colspan="8" class="empty">Error loading positions.</td></tr>`;
@@ -220,15 +347,14 @@ async function loadDashboard() {
 function deriveOpenPositions(trades) {
   const map = {};
   for (const t of trades) {
-    const key = `${t.ticker}::${t.currency || "EUR"}`;
-    if (!map[key]) map[key] = { ticker: t.ticker, currency: t.currency || "EUR", quantity: 0, totalCost: 0 };
-    const qty = t.quantity ?? 0;
-    const price = t.price ?? 0;
+    const key = `${t.ticker}::${t.currency || PREFERRED_CURRENCY}`;
+    if (!map[key]) map[key] = { ticker: t.ticker, currency: t.currency || PREFERRED_CURRENCY, quantity: 0, totalCost: 0 };
+    const qty   = t.quantity ?? 0;
+    const price = t.price    ?? 0;
     if ((t.action || "buy").toLowerCase() === "buy") {
       map[key].totalCost += qty * price;
       map[key].quantity  += qty;
     } else {
-      // SELL: reduce position
       const avgCost = map[key].quantity > 0 ? map[key].totalCost / map[key].quantity : 0;
       map[key].quantity  -= qty;
       map[key].totalCost -= avgCost * qty;
@@ -237,31 +363,53 @@ function deriveOpenPositions(trades) {
   return Object.values(map).filter(p => p.quantity > 0.00001);
 }
 
-function buildPositionRow(pos) {
-  const avgCost     = pos.avg_cost     ?? pos.avgCost     ?? (pos.totalCost && pos.quantity ? pos.totalCost / pos.quantity : null);
-  const currentPrice= pos.current_price?? pos.currentPrice?? null;
-  const qty         = pos.quantity     ?? 0;
-  const currency    = pos.currency     ?? "—";
+/**
+ * Builds a positions table row, converting all monetary values to PREFERRED_CURRENCY.
+ * This function is async because it may need to fetch FX rates.
+ */
+async function buildPositionRow(pos) {
+  const avgCost      = pos.avg_cost      ?? pos.avgCost      ?? (pos.totalCost && pos.quantity ? pos.totalCost / pos.quantity : null);
+  const currentPrice = pos.current_price ?? pos.currentPrice ?? null;
+  const qty          = pos.quantity      ?? 0;
+  const posCurrency  = (pos.currency     ?? PREFERRED_CURRENCY).toUpperCase();
 
-  const marketValue = currentPrice !== null ? qty * currentPrice : null;
-  const costBasis   = avgCost      !== null ? qty * avgCost      : null;
-  const gainLoss    = (marketValue !== null && costBasis !== null) ? marketValue - costBasis : pos.gain ?? pos.unrealized_gain ?? null;
-  const pct         = (gainLoss !== null && costBasis && costBasis !== 0) ? (gainLoss / costBasis) * 100 : null;
+  const marketValueRaw = currentPrice !== null ? qty * currentPrice : null;
+  const costBasisRaw   = avgCost      !== null ? qty * avgCost      : null;
+  const gainLossRaw    = (marketValueRaw !== null && costBasisRaw !== null)
+    ? marketValueRaw - costBasisRaw
+    : pos.gain ?? pos.unrealized_gain ?? null;
 
-  const glClass = gainClass(gainLoss);
-  const glStr   = gainLoss !== null ? `${gainPrefix(gainLoss)}€ ${fmt(Math.abs(gainLoss))}` : "—";
-  const pctStr  = pct      !== null ? `${gainPrefix(pct)}${fmt(Math.abs(pct), 2)}%`        : "—";
+  const pct = (gainLossRaw !== null && costBasisRaw && costBasisRaw !== 0)
+    ? (gainLossRaw / costBasisRaw) * 100
+    : null;
+
+  // Convert monetary values to preferred currency
+  const [avgCostConv, currentPriceConv, marketValueConv, gainLossConv] = await Promise.all([
+    avgCost      !== null ? toPreferred(avgCost,      posCurrency) : Promise.resolve(null),
+    currentPrice !== null ? toPreferred(currentPrice, posCurrency) : Promise.resolve(null),
+    marketValueRaw !== null ? toPreferred(marketValueRaw, posCurrency) : Promise.resolve(null),
+    gainLossRaw    !== null ? toPreferred(gainLossRaw,    posCurrency) : Promise.resolve(null),
+  ]);
+
+  const glClass = gainClass(gainLossConv);
+  const glStr   = gainLossConv  !== null ? fmtMoney(gainLossConv)                          : "—";
+  const pctStr  = pct           !== null ? `${gainPrefix(pct)}${fmt(Math.abs(pct), 2)}%`  : "—";
+
+  // Show original currency badge only when it differs from preferred
+  const currencyBadge = posCurrency !== PREFERRED_CURRENCY
+    ? `<span style="color:var(--text-muted);font-size:0.75em">(${posCurrency})</span>`
+    : "";
 
   return `
     <tr>
-      <td class="ticker-cell">${pos.ticker}</td>
-      <td class="mono">${fmt(qty, 4)}</td>
-      <td class="mono">${avgCost      !== null ? `€ ${fmt(avgCost)}`     : "—"}</td>
-      <td class="mono">${currentPrice !== null ? `€ ${fmt(currentPrice)}`: "—"}</td>
-      <td class="mono">${marketValue  !== null ? `€ ${fmt(marketValue)}` : "—"}</td>
+      <td class="ticker-cell">${pos.ticker} ${currencyBadge}</td>
+      <td class="mono">${fmt(qty, 2)}</td>
+      <td class="mono">${avgCostConv      !== null ? fmtMoney(avgCostConv)      : "—"}</td>
+      <td class="mono">${currentPriceConv !== null ? fmtMoney(currentPriceConv) : "—"}</td>
+      <td class="mono">${marketValueConv  !== null ? fmtMoney(marketValueConv)  : "—"}</td>
       <td class="${glClass}">${glStr}</td>
       <td class="${glClass}">${pctStr}</td>
-      <td class="mono" style="color:var(--text-muted)">${currency}</td>
+      <td class="mono" style="color:var(--text-muted)">${PREFERRED_CURRENCY}</td>
     </tr>
   `;
 }
@@ -337,7 +485,7 @@ function renderPlaceholderChart(trades) {
           bodyColor: "#e2e6f0",
           titleFont: { family: "'IBM Plex Mono'" },
           bodyFont:  { family: "'IBM Plex Mono'" },
-          callbacks: { label: ctx => ` € ${fmt(ctx.parsed.y)}` }
+          callbacks: { label: ctx => { const s = { EUR:"€",USD:"$",GBP:"£",CHF:"CHF",JPY:"¥" }[PREFERRED_CURRENCY]??PREFERRED_CURRENCY; return ` ${fmt(ctx.parsed.y)}${s}`; } }
         }
       },
       scales: {
@@ -347,7 +495,7 @@ function renderPlaceholderChart(trades) {
         },
         y: {
           grid:  { color: "#1c2030", drawBorder: false },
-          ticks: { color: "#6b7490", font: { family: "'IBM Plex Mono'", size: 10 }, callback: v => `€ ${fmt(v, 0)}` }
+          ticks: { color: "#6b7490", font: { family: "'IBM Plex Mono'", size: 10 }, callback: v => { const s = { EUR:"€",USD:"$",GBP:"£",CHF:"CHF",JPY:"¥" }[PREFERRED_CURRENCY]??PREFERRED_CURRENCY; return `${fmt(v,0)}${s}`; } }
         }
       }
     }
@@ -367,10 +515,10 @@ document.querySelectorAll(".tw-btn").forEach(btn => {
 
 function buildTradeRow(trade) {
   const action     = (trade.action || "buy").toLowerCase();
-  const quantity   = trade.quantity   != null ? fmt(trade.quantity, 4) : "—";
-  const price      = trade.price      != null ? fmt(trade.price, 2)    : "—";
+  const quantity   = trade.quantity   != null ? fmt(trade.quantity, 4)   : "—";
+  const price      = trade.price      != null ? fmt(trade.price, 2)      : "—";
   const commission = trade.commission != null ? fmt(trade.commission, 2) : "—";
-  const total      = (trade.quantity != null && trade.price != null) ? fmt(trade.quantity * trade.price) : "—";
+  const total      = (trade.quantity  != null && trade.price != null) ? fmt(trade.quantity * trade.price) : "—";
   const currency   = trade.currency   || "—";
   const date       = fmtDate(trade.date);
   const id         = trade.id ?? trade.trade_id ?? "";
@@ -423,13 +571,11 @@ async function loadTrades() {
 
 const editModal = document.getElementById("edit-modal");
 
-// Cache of loaded trades to populate edit form without re-fetching
 let _tradesCache = [];
 
 async function openEditModal(tradeId) {
   document.getElementById("edit-msg").textContent = "";
 
-  // Try to find trade in cache first, else fetch
   let trade = _tradesCache.find(t => (t.id ?? t.trade_id) === tradeId);
   if (!trade) {
     try {
@@ -451,20 +597,19 @@ async function openEditModal(tradeId) {
   document.getElementById("edit-quantity").value    = trade.quantity   ?? "";
   document.getElementById("edit-price").value       = trade.price      ?? "";
   document.getElementById("edit-commission").value  = trade.commission ?? "0";
-  document.getElementById("edit-currency").value    = trade.currency   || "EUR";
+  document.getElementById("edit-currency").value    = trade.currency   || PREFERRED_CURRENCY;
   document.getElementById("edit-note").value        = trade.note       || "";
 
   editModal.style.display = "flex";
 }
 
-// Auto-uppercase ticker in edit form
 document.getElementById("edit-ticker").addEventListener("input", function () {
   const pos = this.selectionStart;
   this.value = this.value.toUpperCase();
   this.setSelectionRange(pos, pos);
 });
 
-document.getElementById("btn-close-edit").addEventListener("click", () => { editModal.style.display = "none"; });
+document.getElementById("btn-close-edit").addEventListener("click",  () => { editModal.style.display = "none"; });
 document.getElementById("btn-cancel-edit").addEventListener("click", () => { editModal.style.display = "none"; });
 editModal.addEventListener("click", e => { if (e.target === editModal) editModal.style.display = "none"; });
 
@@ -548,7 +693,6 @@ document.getElementById("btn-confirm-delete").addEventListener("click", async ()
   }
 });
 
-// Make modal openers globally accessible (called from inline onclick)
 window.openEditModal   = openEditModal;
 window.openDeleteModal = openDeleteModal;
 
