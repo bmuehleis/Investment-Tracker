@@ -64,7 +64,7 @@ nav { display: flex; gap: 4px; }
 .nav-btn:hover { color: var(--text); background: var(--bg3); }
 .nav-btn.active { color: var(--accent); background: rgba(79,158,255,0.1); }
 
-/* ── Topbar action buttons (refresh + settings) ── */
+/* ── Topbar action buttons ── */
 .topbar-actions {
   display: flex;
   gap: 6px;
@@ -83,10 +83,12 @@ nav { display: flex; gap: 4px; }
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: color 0.15s, background 0.15s;
+  transition: color 0.15s, border-color 0.15s;
   flex-shrink: 0;
+  font-size: 14px;
+  line-height: 1;
 }
-.icon-btn:hover { color: var(--text); background: var(--bg3); border-color: var(--accent); }
+.icon-btn:hover { color: var(--text); border-color: var(--accent); }
 
 /* ── Tabs ── */
 .tab { display: none; padding: 28px; max-width: 1400px; margin: 0 auto; }
@@ -130,6 +132,8 @@ nav { display: flex; gap: 4px; }
 }
 .card-sub.positive { color: var(--green); }
 .card-sub.negative { color: var(--red); }
+.card-value.positive { color: var(--green); }
+.card-value.negative { color: var(--red); }
 
 /* ── Portfolio chart ── */
 .chart-container {
@@ -159,20 +163,11 @@ nav { display: flex; gap: 4px; }
   z-index: 1;
   pointer-events: none;
 }
-.chart-placeholder-icon {
-  font-size: 28px;
-  color: var(--border);
-}
-.chart-placeholder-text {
-  font-size: 13px;
-  color: var(--text-muted);
-}
+.chart-placeholder-icon { font-size: 28px; color: var(--border); }
+.chart-placeholder-text { font-size: 13px; color: var(--text-muted); }
 
 /* ── Time window buttons ── */
-.time-window-btns {
-  display: flex;
-  gap: 4px;
-}
+.time-window-btns { display: flex; gap: 4px; }
 
 .tw-btn {
   background: none;
@@ -259,7 +254,11 @@ tbody td {
 .mono { font-family: var(--font-mono); }
 .ticker-cell { font-family: var(--font-mono); font-weight: 500; color: var(--accent); }
 .empty { color: var(--text-muted); text-align: center; padding: 32px !important; }
-.note-cell { color: var(--text-muted); font-style: italic; max-width: 200px; overflow: hidden; text-overflow: ellipsis; }
+.note-cell { color: var(--text-muted); font-style: italic; max-width: 180px; overflow: hidden; text-overflow: ellipsis; }
+
+.gain-pos { color: var(--green); font-family: var(--font-mono); }
+.gain-neg { color: var(--red);   font-family: var(--font-mono); }
+.gain-neu { color: var(--text-muted); font-family: var(--font-mono); }
 
 .badge {
   display: inline-block;
@@ -272,6 +271,32 @@ tbody td {
 }
 .badge-buy  { background: rgba(52,211,153,0.15); color: var(--green); }
 .badge-sell { background: rgba(248,113,113,0.15); color: var(--red); }
+
+/* ── Action buttons in table ── */
+.action-btns {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.btn-icon-edit,
+.btn-icon-delete {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+.btn-icon-edit  { color: var(--text-muted); }
+.btn-icon-edit:hover  { color: var(--accent); border-color: var(--accent); background: rgba(79,158,255,0.08); }
+.btn-icon-delete { color: var(--text-muted); }
+.btn-icon-delete:hover { color: var(--red); border-color: var(--red); background: rgba(248,113,113,0.08); }
 
 /* ── Buttons ── */
 .btn-primary {
@@ -301,6 +326,20 @@ tbody td {
 }
 .btn-secondary:hover { color: var(--text); }
 
+.btn-danger {
+  background: rgba(248,113,113,0.15);
+  color: var(--red);
+  border: 1px solid rgba(248,113,113,0.3);
+  padding: 10px 24px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.15s;
+}
+.btn-danger:hover { background: rgba(248,113,113,0.25); border-color: var(--red); }
+
 /* ── Form ── */
 .form-section { max-width: 800px; }
 
@@ -310,14 +349,8 @@ tbody td {
   gap: 16px;
   margin-bottom: 16px;
 }
-
-.form-row-3 {
-  grid-template-columns: 2fr 1fr 1fr;
-}
-
-.form-row-4 {
-  grid-template-columns: 1fr 1fr 1fr 1fr;
-}
+.form-row-3 { grid-template-columns: 2fr 1fr 1fr; }
+.form-row-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
 
 .form-group { display: flex; flex-direction: column; gap: 6px; }
 .form-group-full { grid-column: 1 / -1; }
@@ -351,12 +384,10 @@ input, select {
 input:focus, select:focus { border-color: var(--accent); }
 input::placeholder { color: var(--text-muted); }
 
-/* Remove number spinners */
 input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
 input[type=number] { -moz-appearance: textfield; }
 
-/* Date picker icon color fix */
 input[type=date]::-webkit-calendar-picker-indicator { filter: invert(0.5); cursor: pointer; }
 
 .form-preview {
@@ -397,21 +428,19 @@ input[type=date]::-webkit-calendar-picker-indicator { filter: invert(0.5); curso
   transition: all 0.25s;
   z-index: 999;
 }
-.toast.show {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
-}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-/* ── Settings Modal ── */
+/* ── Modals ── */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.6);
+  background: rgba(0,0,0,0.65);
   backdrop-filter: blur(4px);
   z-index: 200;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 20px;
 }
 
 .modal {
@@ -422,6 +451,9 @@ input[type=date]::-webkit-calendar-picker-indicator { filter: invert(0.5); curso
   max-width: 520px;
   box-shadow: 0 24px 80px rgba(0,0,0,0.5);
 }
+
+.modal-wide { max-width: 720px; }
+.modal-sm   { max-width: 420px; }
 
 .modal-header {
   display: flex;
@@ -437,9 +469,7 @@ input[type=date]::-webkit-calendar-picker-indicator { filter: invert(0.5); curso
   margin: 0;
 }
 
-.modal-body {
-  padding: 8px 0;
-}
+.modal-body { padding: 8px 0; }
 
 .modal-footer {
   padding: 16px 24px 20px;
@@ -448,6 +478,7 @@ input[type=date]::-webkit-calendar-picker-indicator { filter: invert(0.5); curso
   justify-content: flex-end;
 }
 
+/* ── Settings rows ── */
 .setting-row {
   display: flex;
   align-items: center;
@@ -468,4 +499,58 @@ input[type=date]::-webkit-calendar-picker-indicator { filter: invert(0.5); curso
 .setting-desc {
   font-size: 12px;
   color: var(--text-muted);
+}
+
+/* ── Creator button (fixed, bottom-left) ── */
+.creator-btn {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  z-index: 150;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 7px 12px;
+  text-decoration: none;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-family: var(--font-sans);
+  overflow: hidden;
+  max-width: 34px;
+  transition: max-width 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+              color 0.2s,
+              border-color 0.2s,
+              background 0.2s;
+  white-space: nowrap;
+}
+
+.creator-btn:hover {
+  max-width: 320px;
+  color: var(--text);
+  border-color: rgba(79,158,255,0.4);
+  background: var(--bg3);
+}
+
+.creator-icon {
+  font-size: 13px;
+  color: var(--red);
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.creator-label {
+  margin-left: 8px;
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: opacity 0.25s 0.1s, transform 0.25s 0.1s;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.creator-btn:hover .creator-label {
+  opacity: 1;
+  transform: translateX(0);
 }
