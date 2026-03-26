@@ -8,6 +8,56 @@
  */
 
 let API = localStorage.getItem("api_url") || "http://127.0.0.1:8000/api/v1";
+let DEFAULT_CURRENCY = localStorage.getItem("default_currency") || "EUR";
+
+// ── Constants ─────────────────────────────────────────────
+const CURRENCY_SYMBOLS = { "EUR": "€", "USD": "$", "GBP": "£" };
+const CACHE_KEYS = {
+  TRADES: "TRADES",
+  GAINS: "GAINS",
+  POSITIONS: "POSITIONS"
+};
+
+// ── Data Caching System ───────────────────────────────────────
+// Smart client-side caching to reduce API calls and improve performance
+
+const DataCache = {
+  storage: {},
+
+  TTL: {
+    TRADES: 24 * 60,           // 24 hours
+    REALIZED_PNL: 4 * 60,      // 4 hours
+    UNREALIZED_PNL: 10,        // 10 minutes
+    POSITIONS: 10,             // 10 minutes
+    PORTFOLIO_VALUE: 10        // 10 minutes
+  },
+
+  set(key, data, ttl_minutes) {
+    this.storage[key] = { data, timestamp: Date.now(), ttl_minutes };
+  },
+
+  get(key) {
+    const item = this.storage[key];
+    if (!item) return null;
+
+    const age_minutes = (Date.now() - item.timestamp) / (1000 * 60);
+    if (age_minutes > item.ttl_minutes) {
+      delete this.storage[key];
+      return null;
+    }
+    return item.data;
+  },
+
+  invalidate(pattern) {
+    for (const key in this.storage) {
+      if (key.includes(pattern)) delete this.storage[key];
+    }
+  },
+
+  clear() {
+    this.storage = {};
+  }
+};
 
 // ── Helpers ──────────────────────────────────────────────
 
@@ -34,6 +84,10 @@ function gainPrefix(val) {
   return (!val || isNaN(val)) ? "" : val > 0 ? "+" : "";
 }
 
+function getCurrencySymbol(currency) {
+  return CURRENCY_SYMBOLS[currency] || currency;
+}
+
 function showToast(msg) {
   const t = document.getElementById("toast");
   t.textContent = msg;
@@ -58,10 +112,11 @@ document.querySelectorAll(".nav-btn").forEach(btn => {
 // ── Global refresh button ─────────────────────────────────
 
 document.getElementById("btn-global-refresh").addEventListener("click", () => {
+  DataCache.clear();
   const active = document.querySelector(".tab.active")?.id?.replace("tab-", "");
   if (active === "dashboard") loadDashboard();
   if (active === "trades")    loadTrades();
-  showToast("Refreshed.");
+  showToast("Cache cleared. Refreshed from server.");
 });
 
 // ── Settings modal ────────────────────────────────────────
@@ -70,6 +125,7 @@ const settingsModal = document.getElementById("settings-modal");
 
 document.getElementById("btn-settings").addEventListener("click", () => {
   document.getElementById("setting-api-url").value = API;
+  document.getElementById("setting-currency").value = DEFAULT_CURRENCY;
   settingsModal.style.display = "flex";
 });
 
@@ -84,11 +140,42 @@ settingsModal.addEventListener("click", e => {
 document.getElementById("btn-save-settings").addEventListener("click", () => {
   const newUrl = document.getElementById("setting-api-url").value.trim().replace(/\/$/, "");
   if (newUrl) { API = newUrl; localStorage.setItem("api_url", API); }
+
+  const newCurrency = document.getElementById("setting-currency").value;
+  if (newCurrency && newCurrency !== DEFAULT_CURRENCY) {
+    // Currency changed - invalidate currency-specific caches
+    DataCache.invalidate(CACHE_KEYS.GAINS);
+    DataCache.invalidate(CACHE_KEYS.POSITIONS);
+  }
+  if (newCurrency) {
+    DEFAULT_CURRENCY = newCurrency;
+    localStorage.setItem("default_currency", DEFAULT_CURRENCY);
+  }
+
   settingsModal.style.display = "none";
   showToast("Settings saved.");
+
+  // Reload dashboard with new settings
+  const active = document.querySelector(".tab.active")?.id?.replace("tab-", "");
+  if (active === "dashboard") loadDashboard();
+  if (active === "trades") loadTrades();
 });
 
 // ── Fetch helpers ─────────────────────────────────────────
+
+// Invalidate all dashboard-related caches
+function invalidateDashboardCaches() {
+  DataCache.invalidate(CACHE_KEYS.GAINS);
+  DataCache.invalidate(CACHE_KEYS.POSITIONS);
+  DataCache.invalidate(CACHE_KEYS.TRADES);
+}
+
+// Auto-refresh dashboard if currently active
+function refreshDashboardIfActive() {
+  if (document.getElementById("tab-dashboard").classList.contains("active")) {
+    loadDashboard();
+  }
+}
 
 async function fetchTrades() {
   const res = await fetch(`${API}/trades`);
@@ -99,9 +186,9 @@ async function fetchTrades() {
 
 async function fetchGains() {
   const [unrealRes, realRes, totalRes] = await Promise.allSettled([
-    fetch(`${API}/portfolio/unrealized`),
-    fetch(`${API}/portfolio/realized`),
-    fetch(`${API}/portfolio/total`),
+    fetch(`${API}/portfolio/unrealized?currency=${DEFAULT_CURRENCY}`),
+    fetch(`${API}/portfolio/realized?currency=${DEFAULT_CURRENCY}`),
+    fetch(`${API}/portfolio/total?currency=${DEFAULT_CURRENCY}`),
   ]);
 
   const safeJson = async (r) => {
@@ -117,10 +204,41 @@ async function fetchGains() {
 }
 
 async function fetchPositions() {
-  const res = await fetch(`${API}/positions/get_positions`);
+  const res = await fetch(`${API}/positions/get_positions?currency=${DEFAULT_CURRENCY}`);
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const data = await res.json();
   return data.positions || data || [];
+}
+
+// ── Cached Fetch Functions ────────────────────────────────
+
+async function fetchTradesCached() {
+  const cached = DataCache.get(CACHE_KEYS.TRADES);
+  if (cached) return cached;
+
+  const trades = await fetchTrades();
+  DataCache.set(CACHE_KEYS.TRADES, trades, DataCache.TTL.TRADES);
+  return trades;
+}
+
+async function fetchGainsCached() {
+  const cacheKey = `${CACHE_KEYS.GAINS}_${DEFAULT_CURRENCY}`;
+  const cached = DataCache.get(cacheKey);
+  if (cached) return cached;
+
+  const gains = await fetchGains();
+  DataCache.set(cacheKey, gains, DataCache.TTL.UNREALIZED_PNL);
+  return gains;
+}
+
+async function fetchPositionsCached() {
+  const cacheKey = `${CACHE_KEYS.POSITIONS}_${DEFAULT_CURRENCY}`;
+  const cached = DataCache.get(cacheKey);
+  if (cached) return cached;
+
+  const positions = await fetchPositions();
+  DataCache.set(cacheKey, positions, DataCache.TTL.POSITIONS);
+  return positions;
 }
 
 // ── Dashboard ─────────────────────────────────────────────
@@ -131,7 +249,7 @@ async function loadDashboard() {
 
   // ── Gains cards ──
   try {
-    const gains = await fetchGains();
+    const gains = await fetchGainsCached();
 
     // Helper to extract a numeric value from various response shapes
     const extractVal = (obj, ...keys) => {
@@ -149,8 +267,9 @@ async function loadDashboard() {
 
     // Portfolio value: fall back to fetching trades if no endpoint
     let portfolioVal = null;
+    let trades = null;
     try {
-      const trades = await fetchTrades();
+      trades = await fetchTradesCached();
 
       const invested = trades
         .filter(t => (t.action || "buy").toLowerCase() === "buy")
@@ -169,13 +288,15 @@ async function loadDashboard() {
         subEl.className   = "card-sub";
         return;
       }
-      el.textContent  = `€ ${gainPrefix(val)}${fmt(Math.abs(val))}`;
+      const symbol = getCurrencySymbol(DEFAULT_CURRENCY);
+      el.textContent  = `${symbol} ${gainPrefix(val)}${fmt(Math.abs(val))}`;
       el.className    = `card-value mono ${val > 0 ? "positive" : val < 0 ? "negative" : ""}`;
       subEl.className = `card-sub ${val > 0 ? "positive" : val < 0 ? "negative" : ""}`;
       subEl.textContent = val > 0 ? "▲ Positive" : val < 0 ? "▼ Negative" : "Breakeven";
     };
 
-    document.getElementById("portfolio-value").textContent = portfolioVal !== null ? `€ ${fmt(portfolioVal)}` : "—";
+    const symbol = getCurrencySymbol(DEFAULT_CURRENCY);
+    document.getElementById("portfolio-value").textContent = portfolioVal !== null ? `${symbol} ${fmt(portfolioVal)}` : "—";
     document.getElementById("portfolio-value").className   = "card-value mono";
 
     setCard("unrealised-gains", "unrealised-gains-sub", unrealVal);
@@ -187,13 +308,17 @@ async function loadDashboard() {
   }
 
   // ── Render chart ──
-  fetchTrades()
-    .then(trades => renderPlaceholderChart(trades))
-    .catch(() => {});
+  if (trades) {
+    renderPlaceholderChart(trades);
+  } else {
+    fetchTradesCached()
+      .then(trades => renderPlaceholderChart(trades))
+      .catch(() => {});
+  }
 
   // ── Open positions ──
   try {
-    const positions = await fetchPositions();
+    const positions = await fetchPositionsCached();
     if (!positions.length) {
       posBody.innerHTML = `<tr><td colspan="8" class="empty">No open positions.</td></tr>`;
       return;
@@ -202,7 +327,7 @@ async function loadDashboard() {
   } catch (e) {
     // Fallback: derive open positions from trades
     try {
-      const trades = await fetchTrades();
+      if (!trades) trades = await fetchTradesCached();
       const derived = deriveOpenPositions(trades);
       if (!derived.length) {
         posBody.innerHTML = `<tr><td colspan="8" class="empty">No open positions.</td></tr>`;
@@ -241,7 +366,7 @@ function buildPositionRow(pos) {
   const avgCost     = pos.avg_cost     ?? pos.avgCost     ?? (pos.totalCost && pos.quantity ? pos.totalCost / pos.quantity : null);
   const currentPrice= pos.current_price?? pos.currentPrice?? null;
   const qty         = pos.quantity     ?? 0;
-  const currency    = pos.currency     ?? "—";
+  const currency    = pos.currency     ?? DEFAULT_CURRENCY ?? "—";
 
   const marketValue = currentPrice !== null ? qty * currentPrice : null;
   const costBasis   = avgCost      !== null ? qty * avgCost      : null;
@@ -249,16 +374,17 @@ function buildPositionRow(pos) {
   const pct         = (gainLoss !== null && costBasis && costBasis !== 0) ? (gainLoss / costBasis) * 100 : null;
 
   const glClass = gainClass(gainLoss);
-  const glStr   = gainLoss !== null ? `${gainPrefix(gainLoss)}€ ${fmt(Math.abs(gainLoss))}` : "—";
+  const symbol = getCurrencySymbol(DEFAULT_CURRENCY);
+  const glStr   = gainLoss !== null ? `${gainPrefix(gainLoss)}${symbol} ${fmt(Math.abs(gainLoss))}` : "—";
   const pctStr  = pct      !== null ? `${gainPrefix(pct)}${fmt(Math.abs(pct), 2)}%`        : "—";
 
   return `
     <tr>
       <td class="ticker-cell">${pos.ticker}</td>
-      <td class="mono">${fmt(qty, 4)}</td>
-      <td class="mono">${avgCost      !== null ? `€ ${fmt(avgCost)}`     : "—"}</td>
-      <td class="mono">${currentPrice !== null ? `€ ${fmt(currentPrice)}`: "—"}</td>
-      <td class="mono">${marketValue  !== null ? `€ ${fmt(marketValue)}` : "—"}</td>
+      <td class="mono">${fmt(qty, 2)}</td>
+      <td class="mono">${avgCost      !== null ? `${symbol} ${fmt(avgCost)}`     : "—"}</td>
+      <td class="mono">${currentPrice !== null ? `${symbol} ${fmt(currentPrice)}`: "—"}</td>
+      <td class="mono">${marketValue  !== null ? `${symbol} ${fmt(marketValue)}` : "—"}</td>
       <td class="${glClass}">${glStr}</td>
       <td class="${glClass}">${pctStr}</td>
       <td class="mono" style="color:var(--text-muted)">${currency}</td>
@@ -337,7 +463,7 @@ function renderPlaceholderChart(trades) {
           bodyColor: "#e2e6f0",
           titleFont: { family: "'IBM Plex Mono'" },
           bodyFont:  { family: "'IBM Plex Mono'" },
-          callbacks: { label: ctx => ` € ${fmt(ctx.parsed.y)}` }
+          callbacks: { label: ctx => ` ${getCurrencySymbol(DEFAULT_CURRENCY)} ${fmt(ctx.parsed.y)}` }
         }
       },
       scales: {
@@ -347,7 +473,7 @@ function renderPlaceholderChart(trades) {
         },
         y: {
           grid:  { color: "#1c2030", drawBorder: false },
-          ticks: { color: "#6b7490", font: { family: "'IBM Plex Mono'", size: 10 }, callback: v => `€ ${fmt(v, 0)}` }
+          ticks: { color: "#6b7490", font: { family: "'IBM Plex Mono'", size: 10 }, callback: v => `${getCurrencySymbol(DEFAULT_CURRENCY)} ${fmt(v, 0)}` }
         }
       }
     }
@@ -423,26 +549,13 @@ async function loadTrades() {
 
 const editModal = document.getElementById("edit-modal");
 
-// Cache of loaded trades to populate edit form without re-fetching
-let _tradesCache = [];
-
 async function openEditModal(tradeId) {
   document.getElementById("edit-msg").textContent = "";
 
-  // Try to find trade in cache first, else fetch
-  let trade = _tradesCache.find(t => (t.id ?? t.trade_id) === tradeId);
-  if (!trade) {
-    try {
-      const all = await fetchTrades();
-      _tradesCache = all;
-      trade = all.find(t => (t.id ?? t.trade_id) === tradeId);
-    } catch (e) {
-      showToast("Could not load trade.");
-      return;
-    }
-  }
-
-  if (!trade) { showToast("Trade not found."); return; }
+  try {
+    const all = await fetchTrades();
+    const trade = all.find(t => (t.id ?? t.trade_id) === tradeId);
+    if (!trade) { showToast("Trade not found."); return; }
 
   document.getElementById("edit-trade-id").value   = tradeId;
   document.getElementById("edit-ticker").value      = trade.ticker     || "";
@@ -504,8 +617,11 @@ document.getElementById("btn-save-edit").addEventListener("click", async () => {
 
     editModal.style.display = "none";
     showToast(`Trade #${id} updated.`);
-    _tradesCache = [];
+
+    // Invalidate caches and auto-refresh
+    invalidateDashboardCaches();
     loadTrades();
+    refreshDashboardIfActive();
   } catch (err) {
     msgEl.textContent = `Error: ${err.message}`;
   }
@@ -539,8 +655,11 @@ document.getElementById("btn-confirm-delete").addEventListener("click", async ()
     deleteModal.style.display = "none";
     _pendingDeleteId = null;
     showToast(`Trade #${id} deleted.`);
-    _tradesCache = [];
+
+    // Invalidate caches and auto-refresh
+    invalidateDashboardCaches();
     loadTrades();
+    refreshDashboardIfActive();
   } catch (err) {
     showToast(`Error: ${err.message}`);
     deleteModal.style.display = "none";
@@ -629,8 +748,11 @@ document.getElementById("add-form").addEventListener("submit", async (e) => {
     document.getElementById("add-form").reset();
     document.getElementById("f-date").valueAsDate = new Date();
     document.getElementById("trade-preview").textContent = "";
-    _tradesCache = [];
+
+    // Invalidate caches and auto-refresh
+    invalidateDashboardCaches();
     showToast("Trade saved!");
+    refreshDashboardIfActive();
   } catch (err) {
     msgEl.className   = "err";
     msgEl.textContent = `Error: ${err.message}`;
