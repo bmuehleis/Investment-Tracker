@@ -44,6 +44,7 @@ body {
   font-weight: 500;
   color: var(--accent);
   letter-spacing: 0.04em;
+  flex-shrink: 0;
 }
 
 nav { display: flex; gap: 4px; }
@@ -62,6 +63,30 @@ nav { display: flex; gap: 4px; }
 }
 .nav-btn:hover { color: var(--text); background: var(--bg3); }
 .nav-btn.active { color: var(--accent); background: rgba(79,158,255,0.1); }
+
+/* ── Topbar action buttons (refresh + settings) ── */
+.topbar-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.icon-btn {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s, background 0.15s;
+  flex-shrink: 0;
+}
+.icon-btn:hover { color: var(--text); background: var(--bg3); border-color: var(--accent); }
 
 /* ── Tabs ── */
 .tab { display: none; padding: 28px; max-width: 1400px; margin: 0 auto; }
@@ -95,6 +120,74 @@ nav { display: flex; gap: 4px; }
   font-size: 24px;
   font-weight: 500;
 }
+
+.card-sub {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 4px;
+  font-family: var(--font-mono);
+  min-height: 16px;
+}
+.card-sub.positive { color: var(--green); }
+.card-sub.negative { color: var(--red); }
+
+/* ── Portfolio chart ── */
+.chart-container {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  position: relative;
+  height: 280px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chart-container canvas {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.chart-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  z-index: 1;
+  pointer-events: none;
+}
+.chart-placeholder-icon {
+  font-size: 28px;
+  color: var(--border);
+}
+.chart-placeholder-text {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* ── Time window buttons ── */
+.time-window-btns {
+  display: flex;
+  gap: 4px;
+}
+
+.tw-btn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  padding: 4px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  transition: all 0.15s;
+}
+.tw-btn:hover { color: var(--text); border-color: var(--text-muted); }
+.tw-btn.active { color: var(--accent); border-color: var(--accent); background: rgba(79,158,255,0.08); }
 
 /* ── Section ── */
 .section { margin-bottom: 40px; }
@@ -166,6 +259,7 @@ tbody td {
 .mono { font-family: var(--font-mono); }
 .ticker-cell { font-family: var(--font-mono); font-weight: 500; color: var(--accent); }
 .empty { color: var(--text-muted); text-align: center; padding: 32px !important; }
+.note-cell { color: var(--text-muted); font-style: italic; max-width: 200px; overflow: hidden; text-overflow: ellipsis; }
 
 .badge {
   display: inline-block;
@@ -208,7 +302,7 @@ tbody td {
 .btn-secondary:hover { color: var(--text); }
 
 /* ── Form ── */
-.form-section { max-width: 640px; }
+.form-section { max-width: 800px; }
 
 .form-row {
   display: grid;
@@ -217,7 +311,16 @@ tbody td {
   margin-bottom: 16px;
 }
 
+.form-row-3 {
+  grid-template-columns: 2fr 1fr 1fr;
+}
+
+.form-row-4 {
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+}
+
 .form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group-full { grid-column: 1 / -1; }
 
 label {
   font-size: 12px;
@@ -225,6 +328,13 @@ label {
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
+}
+
+.label-optional {
+  font-weight: 400;
+  text-transform: none;
+  color: var(--text-muted);
+  opacity: 0.7;
 }
 
 input, select {
@@ -245,6 +355,9 @@ input::placeholder { color: var(--text-muted); }
 input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
 input[type=number] { -moz-appearance: textfield; }
+
+/* Date picker icon color fix */
+input[type=date]::-webkit-calendar-picker-indicator { filter: invert(0.5); cursor: pointer; }
 
 .form-preview {
   background: var(--bg3);
@@ -287,4 +400,72 @@ input[type=number] { -moz-appearance: textfield; }
 .toast.show {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
+}
+
+/* ── Settings Modal ── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  width: 100%;
+  max-width: 520px;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.5);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.modal-header h3 {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.modal-body {
+  padding: 8px 0;
+}
+
+.modal-footer {
+  padding: 16px 24px 20px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border);
+}
+.setting-row:last-child { border-bottom: none; }
+
+.setting-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 3px;
+}
+
+.setting-desc {
+  font-size: 12px;
+  color: var(--text-muted);
 }
