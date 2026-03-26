@@ -17,7 +17,9 @@ logger = setup_logger()
 # -------------------------
 def fetch_stock_data(ticker, start_date, end_date):
     try:
-        return yf.download(ticker, start=start_date, end=end_date, interval='1d')
+        data = yf.download(ticker, start=start_date, end=end_date, interval='1d')
+        currency = yf.Ticker(ticker).info.get('currency', 'UNKNOWN')
+        return (data, currency)
     except Exception:
         logger.exception(f"Fetch failed for {ticker}")
         return None
@@ -43,13 +45,19 @@ def update_ticker(ticker):
 
         logger.info(f"Fetching {ticker}...")
 
-        data = fetch_stock_data(ticker, start_date, today)
+        result = fetch_stock_data(ticker, start_date, today)
 
-        if data is None or data.empty:
+        if result is None:
             logger.warning(f"No data found for ticker '{ticker}' (invalid or delisted)")
             return
 
-        save_stock_data(ticker, data)
+        data, currency = result
+
+        if data.empty:
+            logger.warning(f"No data found for ticker '{ticker}' (invalid or delisted)")
+            return
+
+        save_stock_data(ticker, data, currency)
 
         logger.info(f"{ticker} updated successfully")
 

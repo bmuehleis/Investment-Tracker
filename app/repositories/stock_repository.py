@@ -35,12 +35,40 @@ def get_latest_price(ticker):
 
     return float(result[0]) if result else None
 
+def get_currency_at_date(ticker, date):
+    with get_connection() as conn:
+        cursor = conn.cursor()
 
+        cursor.execute("""
+            SELECT currency
+            FROM stock_data
+            WHERE ticker = ? AND date = ?
+        """, (ticker, date))
+
+        result = cursor.fetchone()
+
+    return result[0] if result else None
+
+def get_latest_currency(ticker):
+    with get_connection() as conn:
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            SELECT currency
+            FROM stock_data
+            WHERE ticker = ?
+            ORDER BY date DESC
+            LIMIT 1
+        """, (ticker,))
+
+        result = cursor.fetchone()
+
+    return result[0] if result else None
 
 # -------------------------
 # WRITE
 # -------------------------
-def save_stock_data(ticker, data):
+def save_stock_data(ticker, data, currency):
     if data.empty:
         return
 
@@ -58,12 +86,13 @@ def save_stock_data(ticker, data):
         data["Low"],
         data["Close"],
         data.get("Adj Close", data["Close"]),
-        data["Volume"].astype(int)
+        data["Volume"].astype(int),
+        [currency] * len(data)
     ))
 
     with get_connection() as conn:
         conn.executemany("""
             INSERT OR REPLACE INTO stock_data
-            (ticker, date, open, high, low, close, adj_close, volume)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            (ticker, date, open, high, low, close, adj_close, volume, currency)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, rows)

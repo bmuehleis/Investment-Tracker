@@ -16,6 +16,7 @@ def create_tables():
                          close REAL,
                          adj_close REAL,
                          volume INTEGER,
+                         currency TEXT,
                          PRIMARY KEY (ticker, date)
                          )
                          """)

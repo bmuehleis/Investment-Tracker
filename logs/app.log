@@ -1,58 +1,57 @@
-2026-03-26 12:36:04,435 | INFO | Starting initial data sync...
-2026-03-26 12:36:04,436 | INFO | Fetching AAPL...
-2026-03-26 12:36:04,843 | INFO | AAPL updated successfully
-2026-03-26 12:36:04,844 | INFO | Fetching GOOGL...
-2026-03-26 12:36:04,977 | INFO | GOOGL updated successfully
-2026-03-26 12:36:04,979 | INFO | Fetching MSFT...
-2026-03-26 12:36:05,137 | INFO | MSFT updated successfully
-2026-03-26 12:36:05,138 | INFO | Initial sync completed.
-2026-03-26 13:39:48,761 | INFO | Starting initial data sync...
-2026-03-26 13:39:48,766 | INFO | Fetching AAPL...
-2026-03-26 13:39:51,384 | INFO | AAPL updated successfully
-2026-03-26 13:39:51,388 | INFO | Fetching GOOGL...
-2026-03-26 13:39:51,703 | INFO | GOOGL updated successfully
-2026-03-26 13:39:51,708 | INFO | Fetching MSFT...
-2026-03-26 13:39:51,960 | INFO | MSFT updated successfully
-2026-03-26 13:39:51,961 | INFO | Initial sync completed.
-2026-03-26 13:39:57,404 | ERROR | Currency conversion failed: list indices must be integers or slices, not str
-2026-03-26 13:39:57,409 | WARNING | No cached FX rate found for USD_EUR
-2026-03-26 13:39:57,861 | ERROR | Currency conversion failed: list indices must be integers or slices, not str
-2026-03-26 13:39:57,863 | WARNING | No cached FX rate found for EUR_GBP
-2026-03-26 13:41:51,661 | INFO | Starting initial data sync...
-2026-03-26 13:41:51,662 | INFO | Fetching AAPL...
-2026-03-26 13:41:52,276 | INFO | AAPL updated successfully
-2026-03-26 13:41:52,280 | INFO | Fetching GOOGL...
-2026-03-26 13:41:52,408 | INFO | GOOGL updated successfully
-2026-03-26 13:41:52,409 | INFO | Fetching MSFT...
-2026-03-26 13:41:52,615 | INFO | MSFT updated successfully
-2026-03-26 13:41:52,615 | INFO | Initial sync completed.
-2026-03-26 13:42:01,707 | ERROR | Currency conversion failed: list indices must be integers or slices, not str
-2026-03-26 13:42:01,709 | WARNING | No cached FX rate found for USD_EUR
-2026-03-26 13:42:01,757 | ERROR | Currency conversion failed: list indices must be integers or slices, not str
-2026-03-26 13:42:01,759 | WARNING | No cached FX rate found for EUR_GBP
-2026-03-26 13:48:04,756 | INFO | Starting initial data sync...
-2026-03-26 13:48:04,757 | INFO | Fetching AAPL...
-2026-03-26 13:48:05,481 | INFO | AAPL updated successfully
-2026-03-26 13:48:05,484 | INFO | Fetching GOOGL...
-2026-03-26 13:48:05,658 | INFO | GOOGL updated successfully
-2026-03-26 13:48:05,661 | INFO | Fetching MSFT...
-2026-03-26 13:48:05,897 | INFO | MSFT updated successfully
-2026-03-26 13:48:05,900 | INFO | Initial sync completed.
-2026-03-26 13:48:05,976 | INFO | Saved FX rate: USD_EUR = 0.86266 from ECB
-2026-03-26 13:48:05,976 | INFO | [API] 100 USD = 86.27 EUR (rate=0.86266)
-2026-03-26 13:48:06,035 | INFO | Saved FX rate: EUR_GBP = 0.86558 from ECB
-2026-03-26 13:48:06,035 | INFO | [API] 100 EUR = 86.56 GBP (rate=0.86558)
-2026-03-26 13:49:23,296 | INFO | Starting initial data sync...
-2026-03-26 13:49:23,296 | INFO | Fetching AAPL...
-2026-03-26 13:49:24,022 | INFO | AAPL updated successfully
-2026-03-26 13:49:24,025 | INFO | Fetching GOOGL...
-2026-03-26 13:49:24,156 | INFO | GOOGL updated successfully
-2026-03-26 13:49:24,159 | INFO | Fetching MSFT...
-2026-03-26 13:49:24,426 | INFO | MSFT updated successfully
-2026-03-26 13:49:24,426 | INFO | Initial sync completed.
-2026-03-26 13:49:24,479 | ERROR | Currency conversion failed (API): HTTPSConnectionPool(host='api.frankfurte.dev', port=443): Max retries exceeded with url: /v2/rates?base=USD&quotes=EUR&providers=ECB (Caused by NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x000002A82B5F6090>: Failed to establish a new connection: [Errno 11001] getaddrinfo failed'))
-2026-03-26 13:49:24,482 | INFO | Retrieved cached FX rate: USD_EUR = 0.86266
-2026-03-26 13:49:24,484 | INFO | [FALLBACK] 100 USD = 86.27 EUR (rate=0.86266)
-2026-03-26 13:49:24,486 | ERROR | Currency conversion failed (API): HTTPSConnectionPool(host='api.frankfurte.dev', port=443): Max retries exceeded with url: /v2/rates?base=EUR&quotes=GBP&providers=ECB (Caused by NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x000002A8473D67D0>: Failed to establish a new connection: [Errno 11001] getaddrinfo failed'))
-2026-03-26 13:49:24,488 | INFO | Retrieved cached FX rate: EUR_GBP = 0.86558
-2026-03-26 13:49:24,488 | INFO | [FALLBACK] 100 EUR = 86.56 GBP (rate=0.86558)
+2026-03-26 22:40:00,358 | INFO | Starting initial data sync...
+2026-03-26 22:40:00,359 | INFO | AAPL already up to date
+2026-03-26 22:40:00,359 | INFO | GOOGL already up to date
+2026-03-26 22:40:00,360 | INFO | MSFT already up to date
+2026-03-26 22:40:00,360 | INFO | Initial sync completed.
+2026-03-26 22:40:03,005 | INFO | Saved FX rate: USD_EUR = 0.86663 from ECB
+2026-03-26 22:40:03,005 | INFO | [API] 145.0 USD = 125.66 EUR (rate=0.86663)
+2026-03-26 22:40:03,035 | INFO | Saved FX rate: USD_EUR = 0.86663 from ECB
+2026-03-26 22:40:03,035 | INFO | [API] 145.0 USD = 125.66 EUR (rate=0.86663)
+2026-03-26 22:40:03,038 | INFO | Saved FX rate: USD_EUR = 0.86663 from ECB
+2026-03-26 22:40:03,038 | INFO | [API] 145.0 USD = 125.66 EUR (rate=0.86663)
+2026-03-26 22:40:03,421 | INFO | Saved FX rate: USD_EUR = 0.86663 from ECB
+2026-03-26 22:40:03,421 | INFO | [API] 0.0 USD = 0.0 EUR (rate=0.86663)
+2026-03-26 22:40:03,440 | INFO | Saved FX rate: USD_EUR = 0.86663 from ECB
+2026-03-26 22:40:03,440 | INFO | [API] 0.0 USD = 0.0 EUR (rate=0.86663)
+2026-03-26 22:40:03,444 | INFO | Saved FX rate: USD_EUR = 0.86663 from ECB
+2026-03-26 22:40:03,444 | INFO | [API] 0.0 USD = 0.0 EUR (rate=0.86663)
+2026-03-26 22:40:03,883 | INFO | Saved FX rate: USD_EUR = 0.86663 from ECB
+2026-03-26 22:40:03,883 | INFO | [API] 252.88999938964844 USD = 219.16 EUR (rate=0.86663)
+2026-03-26 22:40:03,962 | INFO | Saved FX rate: USD_EUR = 0.86663 from ECB
+2026-03-26 22:40:03,962 | INFO | [API] 252.88999938964844 USD = 219.16 EUR (rate=0.86663)
+2026-03-26 22:40:04,274 | INFO | Saved FX rate: USD_EUR = 0.86663 from ECB
+2026-03-26 22:40:04,275 | INFO | [API] 145.0 USD = 125.66 EUR (rate=0.86663)
+2026-03-26 22:40:04,633 | INFO | Saved FX rate: USD_EUR = 0.86663 from ECB
+2026-03-26 22:40:04,634 | INFO | [API] 0.0 USD = 0.0 EUR (rate=0.86663)
+2026-03-26 22:40:05,009 | INFO | Saved FX rate: USD_EUR = 0.86663 from ECB
+2026-03-26 22:40:05,009 | INFO | [API] 145.0 USD = 125.66 EUR (rate=0.86663)
+2026-03-26 22:40:05,346 | INFO | Saved FX rate: USD_EUR = 0.86663 from ECB
+2026-03-26 22:40:05,347 | INFO | [API] 0.0 USD = 0.0 EUR (rate=0.86663)
+2026-03-26 22:40:05,702 | INFO | Saved FX rate: USD_EUR = 0.86663 from ECB
+2026-03-26 22:40:05,702 | INFO | [API] 252.88999938964844 USD = 219.16 EUR (rate=0.86663)
+2026-03-26 22:40:11,881 | INFO | Saved FX rate: USD_EUR = 0.86663 from ECB
+2026-03-26 22:40:11,882 | INFO | [API] 145.0 USD = 125.66 EUR (rate=0.86663)
+2026-03-26 22:40:11,924 | INFO | Saved FX rate: USD_EUR = 0.86663 from ECB
+2026-03-26 22:40:11,924 | INFO | [API] 145.0 USD = 125.66 EUR (rate=0.86663)
+2026-03-26 22:40:11,931 | INFO | Saved FX rate: USD_EUR = 0.86663 from ECB
+2026-03-26 22:40:11,931 | INFO | [API] 145.0 USD = 125.66 EUR (rate=0.86663)
+2026-03-26 22:40:12,314 | INFO | Saved FX rate: USD_EUR = 0.86663 from ECB
+2026-03-26 22:40:12,315 | INFO | [API] 0.0 USD = 0.0 EUR (rate=0.86663)
+2026-03-26 22:40:12,447 | INFO | Saved FX rate: USD_EUR = 0.86663 from ECB
+2026-03-26 22:40:12,447 | INFO | [API] 0.0 USD = 0.0 EUR (rate=0.86663)
+2026-03-26 22:40:12,454 | INFO | Saved FX rate: USD_EUR = 0.86663 from ECB
+2026-03-26 22:40:12,454 | INFO | [API] 0.0 USD = 0.0 EUR (rate=0.86663)
+2026-03-26 22:40:12,769 | INFO | Saved FX rate: USD_EUR = 0.86663 from ECB
+2026-03-26 22:40:12,769 | INFO | [API] 252.88999938964844 USD = 219.16 EUR (rate=0.86663)
+2026-03-26 22:40:12,872 | INFO | Saved FX rate: USD_EUR = 0.86663 from ECB
+2026-03-26 22:40:12,872 | INFO | [API] 252.88999938964844 USD = 219.16 EUR (rate=0.86663)
+2026-03-26 22:40:13,387 | INFO | Saved FX rate: USD_EUR = 0.86663 from ECB
+2026-03-26 22:40:13,388 | INFO | [API] 145.0 USD = 125.66 EUR (rate=0.86663)
+2026-03-26 22:40:13,747 | INFO | Saved FX rate: USD_EUR = 0.86663 from ECB
+2026-03-26 22:40:13,747 | INFO | [API] 0.0 USD = 0.0 EUR (rate=0.86663)
+2026-03-26 22:40:14,127 | INFO | Saved FX rate: USD_EUR = 0.86663 from ECB
+2026-03-26 22:40:14,127 | INFO | [API] 145.0 USD = 125.66 EUR (rate=0.86663)
+2026-03-26 22:40:14,501 | INFO | Saved FX rate: USD_EUR = 0.86663 from ECB
+2026-03-26 22:40:14,501 | INFO | [API] 0.0 USD = 0.0 EUR (rate=0.86663)
+2026-03-26 22:40:14,873 | INFO | Saved FX rate: USD_EUR = 0.86663 from ECB
+2026-03-26 22:40:14,873 | INFO | [API] 252.88999938964844 USD = 219.16 EUR (rate=0.86663)

@@ -6,6 +6,30 @@ from app.repositories.fx_repository import save_fx_rate, get_cached_fx_rate
 
 logger = setup_logger()
 
+def convert_if_needed(amount, from_currency, to_currency, rate_date=None):
+    """
+    Convert amount from one currency to another only if they differ.
+    If currencies are the same, returns amount unchanged.
+
+    Args:
+        amount: Value to convert
+        from_currency: Source currency code (e.g., 'EUR')
+        to_currency: Target currency code (e.g., 'USD')
+        rate_date: Optional date string for historical rate lookup (YYYY-MM-DD)
+
+    Returns:
+        Converted amount in to_currency, or original amount if conversion not needed/fails
+    """
+    if from_currency == to_currency:
+        return amount
+
+    try:
+        converted = convert_currency_api(amount, from_currency, to_currency)
+        return converted if converted is not None else amount
+    except Exception as e:
+        logger.warning(f"Failed to convert {amount} {from_currency} to {to_currency}: {e}")
+        return amount
+
 def convert_currency_api(amount, from_currency, to_currency, provider="ECB"):
     try:
         url = f"{FX_API}?base={from_currency}&quotes={to_currency}&providers={provider}"
