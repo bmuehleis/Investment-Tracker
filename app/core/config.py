@@ -1,3 +1,3 @@
 APP_NAME = "Investment_Tracker"
 DB_NAME = "data.db"
-TICKERS = ["CL2.PA", "F50A.DE"]
+TICKERS = ["AAPL", "GOOGL", "MSFT"]
