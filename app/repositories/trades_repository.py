@@ -1,3 +1,5 @@
+from matplotlib import ticker
+
 from app.core.database import get_connection
 from app.core.logger import setup_logger
 import sqlite3
@@ -159,4 +161,44 @@ def get_all_tickers():
 
     except Exception as e:
         logger.error(f"Error fetching all tickers: {e}")
+        return []
+
+def get_first_trade_date():
+    try:
+        with get_connection() as conn:
+            
+            row = conn.execute(
+                "SELECT MIN(date) AS first_date FROM trades"
+                ).fetchone()
+            return row[0] if row and row[0] else None
+        
+    except Exception as e:
+        logger.error(f"Error fetching first trade date: {e}")
+        return []
+
+def get_trades_up_to(ticker: str, cutoff: str) -> list[dict]:
+    try:
+        with get_connection() as conn:
+            rows = conn.execute(
+                """
+                SELECT date, action, quantity, price, commission, currency
+                FROM transactions
+                WHERE ticker = ? AND date <= ?
+                ORDER BY date ASC
+                """,
+                (ticker, cutoff),
+            ).fetchall()
+            return [
+                {
+                    "date": r[0],
+                    "action": r[1].upper(),
+                    "quantity": float(r[2]),
+                    "price": float(r[3]),
+                    "commission": float(r[4] or 0),
+                    "currency": r[5],
+                }
+                for r in rows
+            ]
+    except Exception as e:
+        logger.error(f"Error fetching trades for {ticker} up to {cutoff}: {e}")
         return []

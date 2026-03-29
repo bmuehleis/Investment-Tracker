@@ -35,6 +35,26 @@ def get_latest_price(ticker):
 
     return float(result[0]) if result else None
 
+def get_price_on_or_before(ticker: str, day_str: str) -> tuple[float | None, str | None]:
+    try:
+        with get_connection() as conn:
+            row = conn.execute(
+                """
+                SELECT adj_close, currency
+                FROM stock_data
+                WHERE ticker = ? AND date <= ?
+                ORDER BY date DESC
+                LIMIT 1
+                """,
+                (ticker, day_str),
+            ).fetchone()
+            if row:
+                return float(row[0]), row[1]
+            return None, None
+    except Exception as e:
+        logger.exception(f"Error fetching price for {ticker} on or before {day_str}: {e}")
+        return None, None
+
 def get_currency_at_date(ticker, date):
     with get_connection() as conn:
         cursor = conn.cursor()

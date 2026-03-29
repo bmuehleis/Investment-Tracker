@@ -2,6 +2,7 @@ import pandas as pd
 from app.core.database import get_connection
 from app.core.logger import setup_logger
 
+
 logger = setup_logger()
 
 

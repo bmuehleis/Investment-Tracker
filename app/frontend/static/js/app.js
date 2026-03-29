@@ -312,9 +312,7 @@ async function loadDashboard() {
   }
 
   // ── Render chart ──
-  fetchTrades()
-    .then(trades => renderPlaceholderChart(trades))
-    .catch(() => {});
+  loadPortfolioChart();
 
   // ── Open positions ──
   try {
@@ -423,57 +421,96 @@ document.getElementById("btn-refresh").addEventListener("click", () => {
 
 let chartInstance = null;
 let currentWindow = "1W";
+let currentChartMode = "absolute"; // "absolute" | "pct"
+let _chartFromDate = null;
+let _chartToDate = null;
 
-function generatePlaceholderData(trades, window) {
-  const days   = { "1W": 7, "1M": 30, "3M": 90, "6M": 180, "1Y": 365, "ALL": 730 }[window] || 30;
-  const points = Math.min(days, 60);
-  const labels = [];
-  const values = [];
-  const now    = Date.now();
-  let   base   = 10000;
-
-  for (let i = points; i >= 0; i--) {
-    const d = new Date(now - i * (days / points) * 86400000);
-    labels.push(d.toLocaleDateString("en-GB", { day: "2-digit", month: "short" }));
-    base += (Math.random() - 0.44) * base * 0.025;
-    values.push(Math.max(0, base));
-  }
-  return { labels, values };
+// Currency symbol helper (reused in chart callbacks)
+function currencySymbol() {
+  return { EUR: "€", USD: "$", GBP: "£", CHF: "CHF", JPY: "¥" }[PREFERRED_CURRENCY] ?? PREFERRED_CURRENCY;
 }
 
-function renderPlaceholderChart(trades) {
+async function fetchPortfolioHistory(window, fromDate, toDate) {
+  let url = `${API}/portfolio/history?range=${window}&currency=${PREFERRED_CURRENCY}`;
+  if (window === "CUSTOM") {
+    if (fromDate) url += `&from_date=${fromDate}`;
+    if (toDate)   url += `&to_date=${toDate}`;
+  }
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json(); // { labels, values, first_trade_date, currency }
+}
+
+function buildChartDatasets(ctx, labels, values, mode) {
+  if (!values.length) return [];
+
+  let displayValues = values;
+
+  if (mode === "pct") {
+    const base = values[0];
+    displayValues = values.map(v => base !== 0 ? ((v - base) / Math.abs(base)) * 100 : 0);
+  }
+
+  // Pick colour based on whether we're up or down overall
+  const netChange = displayValues[displayValues.length - 1] - displayValues[0];
+  const lineColor = netChange >= 0 ? "#34d399" : "#f87171";
+  const gradStart = netChange >= 0 ? "rgba(52,211,153,0.18)" : "rgba(248,113,113,0.18)";
+
+  const gradient = ctx.createLinearGradient(0, 0, 0, 280);
+  gradient.addColorStop(0, gradStart);
+  gradient.addColorStop(1, "rgba(0,0,0,0)");
+
+  return [{
+    data: displayValues,
+    borderColor: lineColor,
+    borderWidth: 2,
+    backgroundColor: gradient,
+    fill: true,
+    tension: 0.35,
+    pointRadius: 0,
+    pointHoverRadius: 5,
+    pointHoverBackgroundColor: lineColor,
+    pointHoverBorderColor: "#0d0f14",
+    pointHoverBorderWidth: 2,
+  }];
+}
+
+function renderPortfolioChart(labels, values) {
   const canvas      = document.getElementById("portfolio-chart");
   const placeholder = document.getElementById("chart-placeholder");
   if (!canvas) return;
 
+  if (!labels.length) {
+    placeholder.style.display = "flex";
+    document.getElementById("chart-placeholder-text").textContent =
+      "No portfolio data for this period.";
+    if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
+    return;
+  }
+
   placeholder.style.display = "none";
   if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
 
-  const { labels, values } = generatePlaceholderData(trades, currentWindow);
   const ctx = canvas.getContext("2d");
-  const gradient = ctx.createLinearGradient(0, 0, 0, 280);
-  gradient.addColorStop(0, "rgba(79,158,255,0.18)");
-  gradient.addColorStop(1, "rgba(79,158,255,0)");
+  const datasets = buildChartDatasets(ctx, labels, values, currentChartMode);
+  const sym = currencySymbol();
+  const isPct = currentChartMode === "pct";
 
-  chartInstance = new Chart(canvas, {
+  // Format x-axis labels for readability
+  const formattedLabels = labels.map(l => {
+    try {
+      const d = new Date(l + "T00:00:00");
+      return d.toLocaleDateString("en-GB", { day: "2-digit", month: "short" });
+    } catch { return l; }
+  });
+
+  chartInstance = new Chart(ctx, {
     type: "line",
-    data: {
-      labels,
-      datasets: [{
-        data: values,
-        borderColor: "#4f9eff",
-        borderWidth: 2,
-        backgroundColor: gradient,
-        fill: true,
-        tension: 0.4,
-        pointRadius: 0,
-        pointHoverRadius: 4,
-        pointHoverBackgroundColor: "#4f9eff",
-      }]
-    },
+    data: { labels: formattedLabels, datasets },
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      animation: { duration: 400 },
       interaction: { mode: "index", intersect: false },
       plugins: {
         legend: { display: false },
@@ -483,31 +520,109 @@ function renderPlaceholderChart(trades) {
           borderWidth: 1,
           titleColor: "#6b7490",
           bodyColor: "#e2e6f0",
-          titleFont: { family: "'IBM Plex Mono'" },
-          bodyFont:  { family: "'IBM Plex Mono'" },
-          callbacks: { label: ctx => { const s = { EUR:"€",USD:"$",GBP:"£",CHF:"CHF",JPY:"¥" }[PREFERRED_CURRENCY]??PREFERRED_CURRENCY; return ` ${fmt(ctx.parsed.y)}${s}`; } }
+          titleFont: { family: "'IBM Plex Mono'", size: 11 },
+          bodyFont:  { family: "'IBM Plex Mono'", size: 12 },
+          padding: 10,
+          callbacks: {
+            label: ctx => {
+              const v = ctx.parsed.y;
+              if (isPct) {
+                return ` ${v >= 0 ? "+" : ""}${fmt(v, 2)}%`;
+              }
+              return ` ${fmt(v, 2)}${sym}`;
+            }
+          }
         }
       },
       scales: {
         x: {
           grid:  { color: "#1c2030", drawBorder: false },
-          ticks: { color: "#6b7490", font: { family: "'IBM Plex Mono'", size: 10 }, maxTicksLimit: 6 }
+          ticks: {
+            color: "#6b7490",
+            font: { family: "'IBM Plex Mono'", size: 10 },
+            maxTicksLimit: 8,
+            maxRotation: 0,
+          }
         },
         y: {
           grid:  { color: "#1c2030", drawBorder: false },
-          ticks: { color: "#6b7490", font: { family: "'IBM Plex Mono'", size: 10 }, callback: v => { const s = { EUR:"€",USD:"$",GBP:"£",CHF:"CHF",JPY:"¥" }[PREFERRED_CURRENCY]??PREFERRED_CURRENCY; return `${fmt(v,0)}${s}`; } }
+          ticks: {
+            color: "#6b7490",
+            font: { family: "'IBM Plex Mono'", size: 10 },
+            callback: v => isPct
+              ? `${v >= 0 ? "+" : ""}${fmt(v, 1)}%`
+              : `${fmt(v, 0)}${sym}`
+          }
         }
       }
     }
   });
 }
 
-document.querySelectorAll(".tw-btn").forEach(btn => {
+async function loadPortfolioChart() {
+  const placeholder = document.getElementById("chart-placeholder");
+  const placeholderText = document.getElementById("chart-placeholder-text");
+  placeholder.style.display = "flex";
+  placeholderText.textContent = "Loading…";
+
+  // Update chart title
+  const titleEl = document.getElementById("chart-title");
+  if (titleEl) {
+    titleEl.textContent = currentChartMode === "pct" ? "Portfolio Return %" : "Portfolio Value";
+  }
+
+  try {
+    const data = await fetchPortfolioHistory(currentWindow, _chartFromDate, _chartToDate);
+    renderPortfolioChart(data.labels || [], data.values || []);
+  } catch (e) {
+    console.warn("Portfolio history fetch failed:", e);
+    placeholder.style.display = "flex";
+    placeholderText.textContent = "Could not load chart data.";
+    if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
+  }
+}
+
+// ── Time window button handlers ──
+document.querySelectorAll(".tw-btn:not(#btn-apply-custom)").forEach(btn => {
   btn.addEventListener("click", () => {
     document.querySelectorAll(".tw-btn").forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
     currentWindow = btn.dataset.window;
-    fetchTrades().then(trades => renderPlaceholderChart(trades)).catch(() => {});
+
+    const customRange = document.getElementById("chart-custom-range");
+    if (currentWindow === "CUSTOM") {
+      customRange.style.display = "flex";
+      // default: last 30 days
+      const today = new Date();
+      const prior = new Date(today);
+      prior.setDate(prior.getDate() - 30);
+      document.getElementById("chart-to").value   = today.toISOString().slice(0,10);
+      document.getElementById("chart-from").value = prior.toISOString().slice(0,10);
+    } else {
+      customRange.style.display = "none";
+      _chartFromDate = null;
+      _chartToDate   = null;
+      loadPortfolioChart();
+    }
+  });
+});
+
+// ── Custom range apply ──
+document.getElementById("btn-apply-custom")?.addEventListener("click", () => {
+  _chartFromDate = document.getElementById("chart-from").value || null;
+  _chartToDate   = document.getElementById("chart-to").value   || null;
+  if (_chartFromDate || _chartToDate) {
+    loadPortfolioChart();
+  }
+});
+
+// ── Mode toggle (€ / %) ──
+document.querySelectorAll(".mode-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".mode-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    currentChartMode = btn.dataset.mode;
+    loadPortfolioChart();
   });
 });
 

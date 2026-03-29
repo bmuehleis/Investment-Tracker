@@ -554,3 +554,38 @@ input[type=date]::-webkit-calendar-picker-indicator { filter: invert(0.5); curso
   opacity: 1;
   transform: translateX(0);
 }
+/* ── Chart mode toggle (€ / %) ── */
+.chart-mode-toggle {
+  display: flex;
+  gap: 2px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 2px;
+}
+
+.mode-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  padding: 3px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.15s;
+  line-height: 1.4;
+}
+.mode-btn:hover { color: var(--text); }
+.mode-btn.active {
+  background: var(--bg2);
+  color: var(--accent);
+  border: 1px solid var(--border);
+}
+
+/* ── Custom date range inputs ── */
+#chart-custom-range input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.5);
+  cursor: pointer;
+}

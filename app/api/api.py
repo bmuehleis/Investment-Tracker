@@ -6,6 +6,7 @@ from pathlib import Path
 from app.api.routes.trades_routes import router as trades_router
 from app.api.routes.portfolio_routes import router as portfolio_router
 from app.api.routes.position_routes import router as positions_router
+from app.api.routes.history_routes import router as history_router
 
 
 app = FastAPI(
@@ -35,3 +36,4 @@ def home(request: Request):
 app.include_router(trades_router, prefix="/api/v1/trades", tags=["Trades"])
 app.include_router(portfolio_router, prefix="/api/v1/portfolio", tags=["Portfolio"])
 app.include_router(positions_router, prefix="/api/v1/positions", tags=["Positions"])
+app.include_router(history_router, prefix="/api/v1/portfolio", tags=["Portfolio"])

@@ -181,21 +181,39 @@
     <!-- Portfolio chart -->
     <section class="section">
       <div class="section-header">
-        <h2>Portfolio Value</h2>
-        <div class="time-window-btns">
-          <button class="tw-btn active" data-window="1W">1W</button>
-          <button class="tw-btn" data-window="1M">1M</button>
-          <button class="tw-btn" data-window="3M">3M</button>
-          <button class="tw-btn" data-window="6M">6M</button>
-          <button class="tw-btn" data-window="1Y">1Y</button>
-          <button class="tw-btn" data-window="ALL">ALL</button>
+        <div style="display:flex;align-items:center;gap:16px;">
+          <h2 id="chart-title">Portfolio Value</h2>
+          <!-- Mode toggle -->
+          <div class="chart-mode-toggle">
+            <button class="mode-btn active" data-mode="absolute" title="Absolute value">€</button>
+            <button class="mode-btn" data-mode="pct" title="Percentage change">%</button>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
+          <!-- Time window buttons -->
+          <div class="time-window-btns">
+            <button class="tw-btn active" data-window="1W">1W</button>
+            <button class="tw-btn" data-window="1M">1M</button>
+            <button class="tw-btn" data-window="3M">3M</button>
+            <button class="tw-btn" data-window="6M">6M</button>
+            <button class="tw-btn" data-window="1Y">1Y</button>
+            <button class="tw-btn" data-window="ALL">ALL</button>
+            <button class="tw-btn" data-window="CUSTOM" id="tw-custom-btn">Custom</button>
+          </div>
+          <!-- Custom date range (hidden by default) -->
+          <div id="chart-custom-range" style="display:none;align-items:center;gap:6px;">
+            <input type="date" id="chart-from" style="font-family:var(--font-mono);font-size:11px;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:4px 8px;border-radius:5px;" />
+            <span style="color:var(--text-muted);font-size:11px;">→</span>
+            <input type="date" id="chart-to" style="font-family:var(--font-mono);font-size:11px;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:4px 8px;border-radius:5px;" />
+            <button class="tw-btn active" id="btn-apply-custom" style="padding:4px 10px;">Apply</button>
+          </div>
         </div>
       </div>
-      <div class="chart-container">
+      <div class="chart-container" style="height:300px;">
         <canvas id="portfolio-chart"></canvas>
         <div class="chart-placeholder" id="chart-placeholder">
           <span class="chart-placeholder-icon">◈</span>
-          <span class="chart-placeholder-text">Placeholder — connect backend for live chart data</span>
+          <span class="chart-placeholder-text" id="chart-placeholder-text">Loading chart data…</span>
         </div>
       </div>
     </section>
