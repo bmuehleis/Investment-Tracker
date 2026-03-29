@@ -135,17 +135,144 @@ nav { display: flex; gap: 4px; }
 .card-value.positive { color: var(--green); }
 .card-value.negative { color: var(--red); }
 
-/* ── Portfolio chart ── */
+/* ── Chart section layout ── */
+.chart-section { margin-bottom: 40px; }
+
+.chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.chart-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.chart-header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── Chart mode toggle (Value / %) ── */
+.chart-mode-toggle {
+  display: flex;
+  gap: 4px;
+}
+
+.mode-btn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  padding: 4px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.mode-btn:hover {
+  color: var(--text);
+  border-color: var(--text-muted);
+}
+
+.mode-btn.active {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: rgba(79,158,255,0.08);
+}
+
+/* ── Custom date range dropdown panel ── */
+.chart-custom-panel {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 16px;
+  margin-top: 10px;
+}
+
+.chart-custom-inner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.chart-custom-field {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.chart-custom-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.chart-date-input {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 5px 8px;
+  border-radius: 5px;
+  outline: none;
+  transition: border-color 0.15s;
+  cursor: pointer;
+}
+.chart-date-input:focus { border-color: var(--accent); }
+.chart-date-input::-webkit-calendar-picker-indicator { filter: invert(0.5); cursor: pointer; }
+
+.chart-custom-sep {
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1;
+}
+
+.btn-apply-range {
+  background: rgba(79,158,255,0.12);
+  color: var(--accent);
+  border: 1px solid rgba(79,158,255,0.3);
+  padding: 5px 14px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.btn-apply-range:hover {
+  background: rgba(79,158,255,0.22);
+  border-color: var(--accent);
+}
+
+/* ── Chart container ── */
 .chart-container {
   background: var(--bg2);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   position: relative;
-  height: 280px;
+  height: 300px;
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-top: 12px;
 }
 
 .chart-container canvas {
@@ -553,39 +680,4 @@ input[type=date]::-webkit-calendar-picker-indicator { filter: invert(0.5); curso
 .creator-btn:hover .creator-label {
   opacity: 1;
   transform: translateX(0);
-}
-/* ── Chart mode toggle (€ / %) ── */
-.chart-mode-toggle {
-  display: flex;
-  gap: 2px;
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 2px;
-}
-
-.mode-btn {
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  padding: 3px 10px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-family: var(--font-mono);
-  font-size: 12px;
-  font-weight: 600;
-  transition: all 0.15s;
-  line-height: 1.4;
-}
-.mode-btn:hover { color: var(--text); }
-.mode-btn.active {
-  background: var(--bg2);
-  color: var(--accent);
-  border: 1px solid var(--border);
-}
-
-/* ── Custom date range inputs ── */
-#chart-custom-range input[type="date"]::-webkit-calendar-picker-indicator {
-  filter: invert(0.5);
-  cursor: pointer;
 }

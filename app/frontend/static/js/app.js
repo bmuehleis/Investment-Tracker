@@ -425,38 +425,42 @@ let currentChartMode = "absolute"; // "absolute" | "pct"
 let _chartFromDate = null;
 let _chartToDate = null;
 
-// Currency symbol helper (reused in chart callbacks)
 function currencySymbol() {
   return { EUR: "€", USD: "$", GBP: "£", CHF: "CHF", JPY: "¥" }[PREFERRED_CURRENCY] ?? PREFERRED_CURRENCY;
 }
 
-async function fetchPortfolioHistory(window, fromDate, toDate) {
-  let url = `${API}/portfolio/history?range=${window}&currency=${PREFERRED_CURRENCY}`;
-  if (window === "CUSTOM") {
+// Keep the "Value" mode button label in sync with the selected currency
+function updateModeBtnLabel() {
+  const btn = document.getElementById("mode-btn-absolute");
+  if (btn) btn.textContent = currencySymbol() + " Value";
+}
+
+async function fetchPortfolioHistory(win, fromDate, toDate) {
+  let url = `${API}/portfolio/history?range=${win}&currency=${PREFERRED_CURRENCY}`;
+  if (win === "CUSTOM") {
     if (fromDate) url += `&from_date=${fromDate}`;
     if (toDate)   url += `&to_date=${toDate}`;
   }
   const res = await fetch(url);
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return res.json(); // { labels, values, first_trade_date, currency }
+  return res.json();
 }
 
-function buildChartDatasets(ctx, labels, values, mode) {
+function buildChartDatasets(ctx, values, mode) {
   if (!values.length) return [];
 
   let displayValues = values;
-
   if (mode === "pct") {
     const base = values[0];
     displayValues = values.map(v => base !== 0 ? ((v - base) / Math.abs(base)) * 100 : 0);
   }
 
-  // Pick colour based on whether we're up or down overall
   const netChange = displayValues[displayValues.length - 1] - displayValues[0];
   const lineColor = netChange >= 0 ? "#34d399" : "#f87171";
-  const gradStart = netChange >= 0 ? "rgba(52,211,153,0.18)" : "rgba(248,113,113,0.18)";
+  const gradStart = netChange >= 0 ? "rgba(52,211,153,0.15)" : "rgba(248,113,113,0.15)";
 
-  const gradient = ctx.createLinearGradient(0, 0, 0, 280);
+  const h = ctx.canvas.clientHeight || 280;
+  const gradient = ctx.createLinearGradient(0, 0, 0, h);
   gradient.addColorStop(0, gradStart);
   gradient.addColorStop(1, "rgba(0,0,0,0)");
 
@@ -482,8 +486,7 @@ function renderPortfolioChart(labels, values) {
 
   if (!labels.length) {
     placeholder.style.display = "flex";
-    document.getElementById("chart-placeholder-text").textContent =
-      "No portfolio data for this period.";
+    document.getElementById("chart-placeholder-text").textContent = "No portfolio data for this period.";
     if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
     return;
   }
@@ -492,15 +495,13 @@ function renderPortfolioChart(labels, values) {
   if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
 
   const ctx = canvas.getContext("2d");
-  const datasets = buildChartDatasets(ctx, labels, values, currentChartMode);
-  const sym = currencySymbol();
+  const datasets = buildChartDatasets(ctx, values, currentChartMode);
+  const sym   = currencySymbol();
   const isPct = currentChartMode === "pct";
 
-  // Format x-axis labels for readability
   const formattedLabels = labels.map(l => {
     try {
-      const d = new Date(l + "T00:00:00");
-      return d.toLocaleDateString("en-GB", { day: "2-digit", month: "short" });
+      return new Date(l + "T00:00:00").toLocaleDateString("en-GB", { day: "2-digit", month: "short" });
     } catch { return l; }
   });
 
@@ -510,7 +511,7 @@ function renderPortfolioChart(labels, values) {
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      animation: { duration: 400 },
+      animation: { duration: 350 },
       interaction: { mode: "index", intersect: false },
       plugins: {
         legend: { display: false },
@@ -526,10 +527,9 @@ function renderPortfolioChart(labels, values) {
           callbacks: {
             label: ctx => {
               const v = ctx.parsed.y;
-              if (isPct) {
-                return ` ${v >= 0 ? "+" : ""}${fmt(v, 2)}%`;
-              }
-              return ` ${fmt(v, 2)}${sym}`;
+              return isPct
+                ? ` ${v >= 0 ? "+" : ""}${fmt(v, 2)}%`
+                : ` ${fmt(v, 2)}${sym}`;
             }
           }
         }
@@ -537,14 +537,10 @@ function renderPortfolioChart(labels, values) {
       scales: {
         x: {
           grid:  { color: "#1c2030", drawBorder: false },
-          ticks: {
-            color: "#6b7490",
-            font: { family: "'IBM Plex Mono'", size: 10 },
-            maxTicksLimit: 8,
-            maxRotation: 0,
-          }
+          ticks: { color: "#6b7490", font: { family: "'IBM Plex Mono'", size: 10 }, maxTicksLimit: 8, maxRotation: 0 }
         },
         y: {
+          position: "right",
           grid:  { color: "#1c2030", drawBorder: false },
           ticks: {
             color: "#6b7490",
@@ -560,20 +556,26 @@ function renderPortfolioChart(labels, values) {
 }
 
 async function loadPortfolioChart() {
-  const placeholder = document.getElementById("chart-placeholder");
+  const placeholder     = document.getElementById("chart-placeholder");
   const placeholderText = document.getElementById("chart-placeholder-text");
+  const titleEl         = document.getElementById("chart-title");
+
   placeholder.style.display = "flex";
   placeholderText.textContent = "Loading…";
-
-  // Update chart title
-  const titleEl = document.getElementById("chart-title");
-  if (titleEl) {
-    titleEl.textContent = currentChartMode === "pct" ? "Portfolio Return %" : "Portfolio Value";
-  }
+  if (titleEl) titleEl.textContent = currentChartMode === "pct" ? "Portfolio Return %" : "Portfolio Value";
+  updateModeBtnLabel();
 
   try {
     const data = await fetchPortfolioHistory(currentWindow, _chartFromDate, _chartToDate);
-    renderPortfolioChart(data.labels || [], data.values || []);
+    const labels = data.labels || [];
+    const values = data.values || [];
+    if (!labels.length || !values.length) {
+      placeholder.style.display = "flex";
+      placeholderText.textContent = "No portfolio data for this period.";
+      if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
+      return;
+    }
+    renderPortfolioChart(labels, values);
   } catch (e) {
     console.warn("Portfolio history fetch failed:", e);
     placeholder.style.display = "flex";
@@ -582,24 +584,27 @@ async function loadPortfolioChart() {
   }
 }
 
-// ── Time window button handlers ──
-document.querySelectorAll(".tw-btn:not(#btn-apply-custom)").forEach(btn => {
+// ── Time window buttons ──
+document.querySelectorAll(".tw-btn").forEach(btn => {
+  if (btn.id === "btn-apply-custom") return; // skip the apply button (it's not a tw-btn but guard anyway)
   btn.addEventListener("click", () => {
     document.querySelectorAll(".tw-btn").forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
     currentWindow = btn.dataset.window;
 
-    const customRange = document.getElementById("chart-custom-range");
+    const panel = document.getElementById("chart-custom-panel");
     if (currentWindow === "CUSTOM") {
-      customRange.style.display = "flex";
-      // default: last 30 days
+      // Show the dropdown panel
+      panel.style.display = "block";
+      // Pre-fill: last 30 days
       const today = new Date();
       const prior = new Date(today);
       prior.setDate(prior.getDate() - 30);
-      document.getElementById("chart-to").value   = today.toISOString().slice(0,10);
-      document.getElementById("chart-from").value = prior.toISOString().slice(0,10);
+      document.getElementById("chart-to").value   = today.toISOString().slice(0, 10);
+      document.getElementById("chart-from").value = prior.toISOString().slice(0, 10);
+      // Don't auto-load yet — wait for Apply
     } else {
-      customRange.style.display = "none";
+      panel.style.display = "none";
       _chartFromDate = null;
       _chartToDate   = null;
       loadPortfolioChart();
@@ -607,25 +612,25 @@ document.querySelectorAll(".tw-btn:not(#btn-apply-custom)").forEach(btn => {
   });
 });
 
-// ── Custom range apply ──
+// ── Custom Apply ──
 document.getElementById("btn-apply-custom")?.addEventListener("click", () => {
   _chartFromDate = document.getElementById("chart-from").value || null;
   _chartToDate   = document.getElementById("chart-to").value   || null;
-  if (_chartFromDate || _chartToDate) {
-    loadPortfolioChart();
-  }
+  if (_chartFromDate || _chartToDate) loadPortfolioChart();
 });
 
-// ── Mode toggle (€ / %) ──
+// ── Mode toggle ──
 document.querySelectorAll(".mode-btn").forEach(btn => {
   btn.addEventListener("click", () => {
     document.querySelectorAll(".mode-btn").forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
     currentChartMode = btn.dataset.mode;
+    const titleEl = document.getElementById("chart-title");
+    if (titleEl) titleEl.textContent = currentChartMode === "pct" ? "Portfolio Return %" : "Portfolio Value";
+    updateModeBtnLabel();
     loadPortfolioChart();
   });
 });
-
 // ── Trades tab ────────────────────────────────────────────
 
 function buildTradeRow(trade) {
@@ -896,17 +901,8 @@ document.getElementById("add-form").addEventListener("submit", async (e) => {
   }
 });
 
-// ── Chart.js loader ───────────────────────────────────────
-
-function loadChartJS(cb) {
-  if (window.Chart) { cb(); return; }
-  const s   = document.createElement("script");
-  s.src     = "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js";
-  s.onload  = cb;
-  s.onerror = () => console.error("Failed to load Chart.js");
-  document.head.appendChild(s);
-}
-
 // ── Init ──────────────────────────────────────────────────
 
-loadChartJS(() => loadDashboard());
+document.addEventListener("DOMContentLoaded", () => {
+  loadDashboard();
+});

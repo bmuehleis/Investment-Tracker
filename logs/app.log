@@ -39,3 +39,176 @@
 2026-03-29 17:42:31,535 | INFO | Retrieved cached FX rate: USD_EUR = 0.86828
 2026-03-29 17:42:31,537 | INFO | Retrieved cached FX rate: USD_EUR = 0.86828
 2026-03-29 17:42:31,538 | INFO | Retrieved cached FX rate: USD_EUR = 0.86828
+2026-03-29 17:54:05,012 | INFO | Starting initial data sync...
+2026-03-29 17:54:05,013 | INFO | Fetching AAPL...
+2026-03-29 17:54:05,783 | INFO | AAPL updated successfully
+2026-03-29 17:54:05,785 | INFO | Fetching GOOGL...
+2026-03-29 17:54:06,601 | INFO | GOOGL updated successfully
+2026-03-29 17:54:06,602 | INFO | Fetching MSFT...
+2026-03-29 17:54:07,427 | INFO | MSFT updated successfully
+2026-03-29 17:54:07,428 | INFO | Initial sync completed.
+2026-03-29 17:54:11,033 | INFO | Saved FX rate: USD_EUR = 0.86828 from ECB
+2026-03-29 17:54:11,033 | INFO | [API] FX USD->EUR = 0.86828
+2026-03-29 17:54:11,053 | INFO | Saved FX rate: USD_EUR = 0.86828 from ECB
+2026-03-29 17:54:11,053 | INFO | [API] FX USD->EUR = 0.86828
+2026-03-29 17:54:11,054 | INFO | Saved FX rate: USD_EUR = 0.86828 from ECB
+2026-03-29 17:54:11,055 | INFO | [API] FX USD->EUR = 0.86828
+2026-03-29 17:55:36,273 | INFO | Starting initial data sync...
+2026-03-29 17:55:36,274 | INFO | Fetching AAPL...
+2026-03-29 17:55:37,308 | INFO | AAPL updated successfully
+2026-03-29 17:55:37,310 | INFO | Fetching GOOGL...
+2026-03-29 17:55:38,546 | INFO | GOOGL updated successfully
+2026-03-29 17:55:38,547 | INFO | Fetching MSFT...
+2026-03-29 17:55:39,408 | INFO | MSFT updated successfully
+2026-03-29 17:55:39,408 | INFO | Initial sync completed.
+2026-03-29 17:55:42,056 | INFO | Saved FX rate: USD_EUR = 0.86828 from ECB
+2026-03-29 17:55:42,057 | INFO | [API] FX USD->EUR = 0.86828
+2026-03-29 17:55:42,059 | INFO | Saved FX rate: USD_EUR = 0.86828 from ECB
+2026-03-29 17:55:42,059 | INFO | [API] FX USD->EUR = 0.86828
+2026-03-29 17:55:42,088 | INFO | Saved FX rate: USD_EUR = 0.86828 from ECB
+2026-03-29 17:55:42,088 | INFO | [API] FX USD->EUR = 0.86828
+2026-03-29 17:56:58,924 | INFO | Retrieved cached FX rate: USD_EUR = 0.86828
+2026-03-29 17:59:20,446 | INFO | Starting initial data sync...
+2026-03-29 17:59:20,447 | INFO | Fetching AAPL...
+2026-03-29 17:59:21,184 | INFO | AAPL updated successfully
+2026-03-29 17:59:21,186 | INFO | Fetching GOOGL...
+2026-03-29 17:59:21,931 | INFO | GOOGL updated successfully
+2026-03-29 17:59:21,933 | INFO | Fetching MSFT...
+2026-03-29 17:59:22,684 | INFO | MSFT updated successfully
+2026-03-29 17:59:22,684 | INFO | Initial sync completed.
+2026-03-29 17:59:24,727 | INFO | Saved FX rate: USD_EUR = 0.86828 from ECB
+2026-03-29 17:59:24,727 | INFO | [API] FX USD->EUR = 0.86828
+2026-03-29 17:59:24,734 | INFO | Saved FX rate: USD_EUR = 0.86828 from ECB
+2026-03-29 17:59:24,734 | INFO | [API] FX USD->EUR = 0.86828
+2026-03-29 17:59:24,875 | INFO | Saved FX rate: USD_EUR = 0.86828 from ECB
+2026-03-29 17:59:24,875 | INFO | [API] FX USD->EUR = 0.86828
+2026-03-29 18:03:36,152 | INFO | Starting initial data sync...
+2026-03-29 18:03:36,153 | INFO | Fetching AAPL...
+2026-03-29 18:03:36,919 | INFO | AAPL updated successfully
+2026-03-29 18:03:36,920 | INFO | Fetching GOOGL...
+2026-03-29 18:03:37,870 | INFO | GOOGL updated successfully
+2026-03-29 18:03:37,871 | INFO | Fetching MSFT...
+2026-03-29 18:03:38,652 | INFO | MSFT updated successfully
+2026-03-29 18:03:38,652 | INFO | Initial sync completed.
+2026-03-29 18:03:41,271 | INFO | Saved FX rate: USD_EUR = 0.86828 from ECB
+2026-03-29 18:03:41,272 | INFO | [API] FX USD->EUR = 0.86828
+2026-03-29 18:03:41,283 | INFO | Saved FX rate: USD_EUR = 0.86828 from ECB
+2026-03-29 18:03:41,283 | INFO | [API] FX USD->EUR = 0.86828
+2026-03-29 18:03:41,314 | INFO | Saved FX rate: USD_EUR = 0.86828 from ECB
+2026-03-29 18:03:41,314 | INFO | [API] FX USD->EUR = 0.86828
+2026-03-29 18:05:06,092 | INFO | Starting initial data sync...
+2026-03-29 18:05:06,094 | INFO | Fetching AAPL...
+2026-03-29 18:05:06,839 | INFO | AAPL updated successfully
+2026-03-29 18:05:06,840 | INFO | Fetching GOOGL...
+2026-03-29 18:05:07,643 | INFO | GOOGL updated successfully
+2026-03-29 18:05:07,645 | INFO | Fetching MSFT...
+2026-03-29 18:05:08,716 | INFO | MSFT updated successfully
+2026-03-29 18:05:08,716 | INFO | Initial sync completed.
+2026-03-29 18:05:10,665 | INFO | Saved FX rate: USD_EUR = 0.86828 from ECB
+2026-03-29 18:05:10,665 | INFO | [API] FX USD->EUR = 0.86828
+2026-03-29 18:05:10,674 | INFO | Saved FX rate: USD_EUR = 0.86828 from ECB
+2026-03-29 18:05:10,674 | INFO | [API] FX USD->EUR = 0.86828
+2026-03-29 18:05:10,777 | INFO | Saved FX rate: USD_EUR = 0.86828 from ECB
+2026-03-29 18:05:10,777 | INFO | [API] FX USD->EUR = 0.86828
+2026-03-29 18:06:25,621 | INFO | Starting initial data sync...
+2026-03-29 18:06:25,623 | INFO | Fetching AAPL...
+2026-03-29 18:06:27,613 | INFO | AAPL updated successfully
+2026-03-29 18:06:27,615 | INFO | Fetching GOOGL...
+2026-03-29 18:06:29,116 | INFO | GOOGL updated successfully
+2026-03-29 18:06:29,118 | INFO | Fetching MSFT...
+2026-03-29 18:06:31,132 | INFO | MSFT updated successfully
+2026-03-29 18:06:31,132 | INFO | Initial sync completed.
+2026-03-29 18:07:18,337 | INFO | Saved FX rate: USD_EUR = 0.86828 from ECB
+2026-03-29 18:07:18,338 | INFO | [API] FX USD->EUR = 0.86828
+2026-03-29 18:07:18,387 | INFO | Saved FX rate: USD_EUR = 0.86828 from ECB
+2026-03-29 18:07:18,387 | INFO | [API] FX USD->EUR = 0.86828
+2026-03-29 18:07:18,410 | INFO | Saved FX rate: USD_EUR = 0.86828 from ECB
+2026-03-29 18:07:18,410 | INFO | [API] FX USD->EUR = 0.86828
+2026-03-29 18:12:06,626 | INFO | Starting initial data sync...
+2026-03-29 18:12:06,627 | INFO | Fetching AAPL...
+2026-03-29 18:12:07,524 | INFO | AAPL updated successfully
+2026-03-29 18:12:07,525 | INFO | Fetching GOOGL...
+2026-03-29 18:12:08,282 | INFO | GOOGL updated successfully
+2026-03-29 18:12:08,283 | INFO | Fetching MSFT...
+2026-03-29 18:12:09,170 | INFO | MSFT updated successfully
+2026-03-29 18:12:09,170 | INFO | Initial sync completed.
+2026-03-29 18:12:11,894 | INFO | Saved FX rate: USD_EUR = 0.86828 from ECB
+2026-03-29 18:12:11,895 | INFO | [API] FX USD->EUR = 0.86828
+2026-03-29 18:12:11,908 | INFO | Saved FX rate: USD_EUR = 0.86828 from ECB
+2026-03-29 18:12:11,908 | INFO | [API] FX USD->EUR = 0.86828
+2026-03-29 18:12:11,924 | INFO | Saved FX rate: USD_EUR = 0.86828 from ECB
+2026-03-29 18:12:11,925 | INFO | [API] FX USD->EUR = 0.86828
+2026-03-29 18:15:57,936 | INFO | Starting initial data sync...
+2026-03-29 18:15:57,937 | INFO | Fetching AAPL...
+2026-03-29 18:15:58,735 | INFO | AAPL updated successfully
+2026-03-29 18:15:58,737 | INFO | Fetching GOOGL...
+2026-03-29 18:15:59,467 | INFO | GOOGL updated successfully
+2026-03-29 18:15:59,469 | INFO | Fetching MSFT...
+2026-03-29 18:16:00,334 | INFO | MSFT updated successfully
+2026-03-29 18:16:00,334 | INFO | Initial sync completed.
+2026-03-29 18:16:02,212 | INFO | Saved FX rate: USD_EUR = 0.86828 from ECB
+2026-03-29 18:16:02,212 | INFO | [API] FX USD->EUR = 0.86828
+2026-03-29 18:16:02,232 | INFO | Saved FX rate: USD_EUR = 0.86828 from ECB
+2026-03-29 18:16:02,233 | INFO | [API] FX USD->EUR = 0.86828
+2026-03-29 18:16:02,334 | INFO | Saved FX rate: USD_EUR = 0.86828 from ECB
+2026-03-29 18:16:02,335 | INFO | [API] FX USD->EUR = 0.86828
+2026-03-29 18:19:15,667 | INFO | Starting initial data sync...
+2026-03-29 18:19:15,669 | INFO | Fetching AAPL...
+2026-03-29 18:19:16,414 | INFO | AAPL updated successfully
+2026-03-29 18:19:16,416 | INFO | Fetching GOOGL...
+2026-03-29 18:19:17,262 | INFO | GOOGL updated successfully
+2026-03-29 18:19:17,264 | INFO | Fetching MSFT...
+2026-03-29 18:19:18,082 | INFO | MSFT updated successfully
+2026-03-29 18:19:18,082 | INFO | Initial sync completed.
+2026-03-29 18:19:55,017 | INFO | Saved FX rate: USD_EUR = 0.86828 from ECB
+2026-03-29 18:19:55,018 | INFO | [API] FX USD->EUR = 0.86828
+2026-03-29 18:19:55,047 | INFO | Saved FX rate: USD_EUR = 0.86828 from ECB
+2026-03-29 18:19:55,047 | INFO | [API] FX USD->EUR = 0.86828
+2026-03-29 18:19:55,062 | INFO | Saved FX rate: USD_EUR = 0.86828 from ECB
+2026-03-29 18:19:55,062 | INFO | [API] FX USD->EUR = 0.86828
+2026-03-29 18:21:23,519 | INFO | Starting initial data sync...
+2026-03-29 18:21:23,520 | INFO | Fetching AAPL...
+2026-03-29 18:21:24,400 | INFO | AAPL updated successfully
+2026-03-29 18:21:24,401 | INFO | Fetching GOOGL...
+2026-03-29 18:21:25,148 | INFO | GOOGL updated successfully
+2026-03-29 18:21:25,150 | INFO | Fetching MSFT...
+2026-03-29 18:21:25,941 | INFO | MSFT updated successfully
+2026-03-29 18:21:25,941 | INFO | Initial sync completed.
+2026-03-29 18:21:28,698 | INFO | Saved FX rate: USD_EUR = 0.86828 from ECB
+2026-03-29 18:21:28,698 | INFO | [API] FX USD->EUR = 0.86828
+2026-03-29 18:21:28,711 | INFO | Saved FX rate: USD_EUR = 0.86828 from ECB
+2026-03-29 18:21:28,711 | INFO | [API] FX USD->EUR = 0.86828
+2026-03-29 18:21:28,713 | INFO | Saved FX rate: USD_EUR = 0.86828 from ECB
+2026-03-29 18:21:28,714 | INFO | [API] FX USD->EUR = 0.86828
+2026-03-29 18:21:53,053 | INFO | Starting initial data sync...
+2026-03-29 18:21:53,054 | INFO | Fetching AAPL...
+2026-03-29 18:21:53,811 | INFO | AAPL updated successfully
+2026-03-29 18:21:53,813 | INFO | Fetching GOOGL...
+2026-03-29 18:21:54,623 | INFO | GOOGL updated successfully
+2026-03-29 18:21:54,624 | INFO | Fetching MSFT...
+2026-03-29 18:21:55,241 | INFO | MSFT updated successfully
+2026-03-29 18:21:55,241 | INFO | Initial sync completed.
+2026-03-29 18:22:07,103 | INFO | Saved FX rate: USD_EUR = 0.86828 from ECB
+2026-03-29 18:22:07,104 | INFO | [API] FX USD->EUR = 0.86828
+2026-03-29 18:22:07,141 | INFO | Saved FX rate: USD_EUR = 0.86828 from ECB
+2026-03-29 18:22:07,141 | INFO | [API] FX USD->EUR = 0.86828
+2026-03-29 18:22:07,158 | INFO | Saved FX rate: USD_EUR = 0.86828 from ECB
+2026-03-29 18:22:07,158 | INFO | [API] FX USD->EUR = 0.86828
+2026-03-29 18:22:32,167 | INFO | Starting initial data sync...
+2026-03-29 18:22:32,168 | INFO | Fetching AAPL...
+2026-03-29 18:22:32,946 | INFO | AAPL updated successfully
+2026-03-29 18:22:32,947 | INFO | Fetching GOOGL...
+2026-03-29 18:22:33,878 | INFO | GOOGL updated successfully
+2026-03-29 18:22:33,880 | INFO | Fetching MSFT...
+2026-03-29 18:22:34,665 | INFO | MSFT updated successfully
+2026-03-29 18:22:34,665 | INFO | Initial sync completed.
+2026-03-29 18:22:37,626 | INFO | Saved FX rate: USD_EUR = 0.86828 from ECB
+2026-03-29 18:22:37,627 | INFO | [API] FX USD->EUR = 0.86828
+2026-03-29 18:22:37,639 | INFO | Saved FX rate: USD_EUR = 0.86828 from ECB
+2026-03-29 18:22:37,639 | INFO | [API] FX USD->EUR = 0.86828
+2026-03-29 18:22:37,655 | INFO | Saved FX rate: USD_EUR = 0.86828 from ECB
+2026-03-29 18:22:37,655 | INFO | [API] FX USD->EUR = 0.86828
+2026-03-29 18:25:15,387 | INFO | Retrieved cached FX rate: USD_EUR = 0.86828
+2026-03-29 18:25:45,964 | INFO | Retrieved cached FX rate: USD_EUR = 0.86828
+2026-03-29 18:26:42,508 | INFO | Retrieved cached FX rate: USD_EUR = 0.86828
+2026-03-29 18:29:15,790 | INFO | Retrieved cached FX rate: USD_EUR = 0.86828
