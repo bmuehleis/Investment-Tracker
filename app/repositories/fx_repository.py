@@ -37,9 +37,9 @@ def get_cached_fx_rate(from_currency, to_currency):
             ).fetchone()
             rate = row[0] if row else None
             if rate:
-                logger.info(f"Retrieved cached FX rate: {pair} = {rate}")
+                logger.info(f"Retrieved cached FX rate: {pair} = {rate}", cooldown=30, key=f"fx_rate_{pair}")
             else:
-                logger.warning(f"No cached FX rate found for {pair}")
+                logger.warning(f"No cached FX rate found for {pair}", cooldown=30, key=f"fx_rate_{pair}")
             return rate
     except Exception as e:
         logger.error(f"Failed to retrieve FX rate for {pair}: {str(e)}")
