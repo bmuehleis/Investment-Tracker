@@ -168,7 +168,7 @@ def get_first_trade_date():
         with get_connection() as conn:
             
             row = conn.execute(
-                "SELECT MIN(date) AS first_date FROM trades"
+                "SELECT MIN(date) AS first_date FROM transactions"
                 ).fetchone()
             return row[0] if row and row[0] else None
         

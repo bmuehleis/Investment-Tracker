@@ -1,7 +1,16 @@
 from app.repositories.fx_repository import get_cached_fx_rate
 from app.repositories.stock_repository import get_price_on_or_before
 from app.repositories.trades_repository import get_trades_up_to
-from app.api.routes.history_routes import _compute_holdings
+
+
+def _compute_holdings(trades: list[dict]) -> float:
+    qty = 0.0
+    for t in trades:
+        if t["action"] == "BUY":
+            qty += t["quantity"]
+        elif t["action"] == "SELL":
+            qty -= t["quantity"]
+    return max(qty, 0.0)
 
 
 def calculate_portfolio_value_on_day(
@@ -9,7 +18,7 @@ def calculate_portfolio_value_on_day(
     day_str: str,
     target_currency: str,
 ) -> float | None:
-    
+
     total = 0.0
     has_data = False
 
@@ -26,8 +35,7 @@ def calculate_portfolio_value_on_day(
         if price is None:
             continue
 
-        # Convert stock price to target currency
-        fx = get_cached_fx_rate( stock_currency or "USD", target_currency)
+        fx = get_cached_fx_rate(stock_currency or "USD", target_currency)
         value_in_target = holdings * price * fx
 
         total += value_in_target

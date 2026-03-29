@@ -17,15 +17,15 @@ from app.services.portfolio_service import calculate_portfolio_value_on_day
 logger = setup_logger()
 router = APIRouter()
 
-# --------------------------------------------------------------------
+# ---------------------------------------------------------------------------
 # Helpers
-# --------------------------------------------------------------------
+# ---------------------------------------------------------------------------
 
 def _date_range(start: date, end: date, window: str) -> list[date]:
     delta = (end - start).days
     if delta <= 0:
         return [start]
-    
+
     if window in ("1W",):
         step = 1
     elif window in ("1M",):
@@ -50,14 +50,6 @@ def _date_range(start: date, end: date, window: str) -> list[date]:
 
     return days
 
-def _compute_holdings(trades: list[dict]) -> float:
-    qty = 0.0
-    for t in trades:
-        if t["action"] == "BUY":
-            qty += t["quantity"]
-        elif t["action"] == "SELL":
-            qty -= t["quantity"]
-    return max(qty, 0.0)
 
 # ---------------------------------------------------------------------------
 # Route
@@ -83,7 +75,6 @@ def portfolio_history(
     today = date.today()
     currency = currency.upper()
 
-
     first_trade_str = get_first_trade_date()
     tickers = get_all_tickers()
 
@@ -95,7 +86,7 @@ def portfolio_history(
             "currency": currency,
         }
 
-    first_trade_date = date.fromisoformat(first_trade_str)
+    first_trade_date = date.fromisoformat(first_trade_str[:10])
 
     # --- Determine [range_start, range_end] ---
     if range == "CUSTOM":
@@ -113,7 +104,7 @@ def portfolio_history(
         range_start = today - timedelta(days=days_back)
         range_end = today
 
-    # Cap start to first trade — no point showing zeroes before any investment
+    # Cap start to first trade — no zeroes before any investment exists
     effective_start = max(range_start, first_trade_date)
     effective_end = min(range_end, today)
 
