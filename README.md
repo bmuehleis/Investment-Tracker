@@ -12,7 +12,7 @@ A personal investment tracking application built to run with a fully self-manage
   - Realized gains  
   - Unrealized gains  
   - Total gains  
-- Portfolio performance graph (functionality has known bugs)
+- Portfolio performance graph
 - Overview of open positions  
 - Monitor gains/losses per open position  
 - Full FX rate compatibility:
