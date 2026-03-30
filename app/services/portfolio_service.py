@@ -12,6 +12,7 @@ def _compute_holdings(trades: list[dict]) -> float:
             qty -= t["quantity"]
     return max(qty, 0.0)
 
+
 def _compute_cost_basis_fifo(trades: list[dict]) -> float:
     """
     Returns the total cost basis (in trade currency) of the currently
@@ -20,14 +21,14 @@ def _compute_cost_basis_fifo(trades: list[dict]) -> float:
     all open lots — i.e. the original purchase cost of what is still held.
     """
     buy_queue: list[dict] = []  # [{"shares": float, "price": float}]
- 
+
     for t in trades:
         qty = t["quantity"]
         price = t["price"]
- 
+
         if t["action"] == "BUY":
             buy_queue.append({"shares": qty, "price": price})
- 
+
         elif t["action"] == "SELL":
             remaining = qty
             while remaining > 0 and buy_queue:
@@ -37,7 +38,7 @@ def _compute_cost_basis_fifo(trades: list[dict]) -> float:
                 remaining -= used
                 if lot["shares"] <= 0:
                     buy_queue.pop(0)
- 
+
     return sum(lot["shares"] * lot["price"] for lot in buy_queue)
 
 
@@ -71,6 +72,7 @@ def calculate_portfolio_value_on_day(
 
     return total if has_data else None
 
+
 def calculate_portfolio_cost_basis_on_day(
     tickers: list[str],
     day_str: str,
@@ -82,20 +84,20 @@ def calculate_portfolio_cost_basis_on_day(
     that is actively invested (i.e. what was paid for shares still held).
     """
     total = 0.0
- 
+
     for ticker in tickers:
         trades = get_trades_up_to(ticker, day_str)
         if not trades:
             continue
- 
+
         # Determine the trade currency from the first trade for this ticker
         trade_currency = trades[0].get("currency") or "USD"
- 
+
         cost_in_trade_currency = _compute_cost_basis_fifo(trades)
         if cost_in_trade_currency <= 0:
             continue
- 
+
         fx = get_cached_fx_rate(trade_currency, target_currency)
         total += cost_in_trade_currency * fx
- 
+
     return total

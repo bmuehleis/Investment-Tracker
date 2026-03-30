@@ -11,7 +11,7 @@ Query params:
 from datetime import date, timedelta
 from fastapi import APIRouter, Query
 from app.core.logger import setup_logger
-from app.repositories.trades_repository import get_all_tickers, get_first_trade_date
+from app.repositories.trades_repository import get_all_tickers, get_first_trade_date, get_all_trades
 from app.services.portfolio_service import (
     calculate_portfolio_value_on_day,
     calculate_portfolio_cost_basis_on_day,
@@ -138,11 +138,27 @@ def portfolio_history(
     today_str = today.isoformat()
     today_value = calculate_portfolio_value_on_day(tickers, today_str, currency)
 
+    # Trades within the visible range (for trade markers on the chart)
+    all_trades = get_all_trades()
+    range_trades = [
+        {
+            "date": t["date"][:10],
+            "action": t["action"],
+            "ticker": t["ticker"],
+            "quantity": t["quantity"],
+            "price": t["price"],
+            "currency": t.get("currency", ""),
+        }
+        for t in all_trades
+        if t.get("date") and effective_start.isoformat() <= t["date"][:10] <= effective_end.isoformat()
+    ]
+
     return {
         "labels": labels,
         "values": values,
         "cost_bases": cost_bases,
         "today_value": round(today_value, 2) if today_value is not None else None,
+        "trades": range_trades,
         "first_trade_date": first_trade_str,
         "currency": currency,
     }

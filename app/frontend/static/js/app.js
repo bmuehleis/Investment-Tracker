@@ -411,7 +411,7 @@ document.getElementById("btn-refresh").addEventListener("click", () => {
 
 let chartInstance = null;
 let currentWindow = "1W";
-let currentChartMode = "absolute"; // "absolute" | "pct"
+let currentChartMode = "pct"; // "absolute" | "pct"  — percentage is the default
 let _chartFromDate = null;
 let _chartToDate = null;
 
@@ -436,29 +436,21 @@ async function fetchPortfolioHistory(win, fromDate, toDate) {
   return res.json();
 }
 
-function buildChartDatasets(ctx, values, costBases, mode) {
+function buildChartDatasets(ctx, labels, values, costBases, trades, mode) {
   if (!values.length) return [];
 
+  // ── Main line dataset ──────────────────────────────────
   let displayValues;
   if (mode === "pct") {
-    // Percentage return = (market_value - cost_basis) / cost_basis * 100
-    // This shows pure price appreciation relative to what was paid,
-    // unaffected by purchases or sales of shares.
+    // % unrealised return: (market_value - cost_basis) / cost_basis * 100
     displayValues = values.map((v, i) => {
-      const cb = (costBases && costBases[i]) ? costBases[i] : null;
-      if (cb === null || cb === 0) return 0;
+      const cb = costBases && costBases[i] ? costBases[i] : null;
+      if (!cb || cb === 0) return 0;
       return ((v - cb) / Math.abs(cb)) * 100;
     });
   } else {
-    // Price-return series: remove the effect of capital flows.
-    // We show (market_value - cost_basis) + initial_cost_basis so the line
-    // starts at the initial investment and moves only with price changes.
-    const initialCostBasis = (costBases && costBases.length > 0) ? costBases[0] : values[0];
-    displayValues = values.map((v, i) => {
-      const cb = (costBases && costBases[i] !== undefined) ? costBases[i] : initialCostBasis;
-      const unrealised = v - cb;
-      return initialCostBasis + unrealised;
-    });
+    // Raw market value — jumps are intentional, trade markers explain them
+    displayValues = values;
   }
 
   const netChange = displayValues[displayValues.length - 1] - displayValues[0];
@@ -470,7 +462,8 @@ function buildChartDatasets(ctx, values, costBases, mode) {
   gradient.addColorStop(0, gradStart);
   gradient.addColorStop(1, "rgba(0,0,0,0)");
 
-  return [{
+  const mainDataset = {
+    label: "portfolio",
     data: displayValues,
     borderColor: lineColor,
     borderWidth: 2,
@@ -482,10 +475,75 @@ function buildChartDatasets(ctx, values, costBases, mode) {
     pointHoverBackgroundColor: lineColor,
     pointHoverBorderColor: "#0d0f14",
     pointHoverBorderWidth: 2,
-  }];
+    order: 2,
+  };
+
+  // ── Trade marker dataset ───────────────────────────────
+  if (!trades || !trades.length) return [mainDataset];
+
+  // Build label -> index lookup
+  const labelIndex = {};
+  labels.forEach((l, i) => { labelIndex[l] = i; });
+
+  function nearestLabelIdx(tradeDateStr) {
+    if (labelIndex[tradeDateStr] !== undefined) return labelIndex[tradeDateStr];
+    const td = new Date(tradeDateStr).getTime();
+    let best = -1, bestDiff = Infinity;
+    labels.forEach((l, i) => {
+      const diff = Math.abs(new Date(l).getTime() - td);
+      if (diff < bestDiff) { bestDiff = diff; best = i; }
+    });
+    return best;
+  }
+
+  // Group trades by chart index
+  const markerMap = {};
+  trades.forEach(t => {
+    const idx = nearestLabelIdx(t.date);
+    if (idx < 0) return;
+    if (!markerMap[idx]) markerMap[idx] = { buys: [], sells: [], idx };
+    if ((t.action || "").toUpperCase() === "BUY") markerMap[idx].buys.push(t);
+    else markerMap[idx].sells.push(t);
+  });
+
+  const markerData   = new Array(displayValues.length).fill(null);
+  const markerColors = new Array(displayValues.length).fill("transparent");
+  const markerMeta   = new Array(displayValues.length).fill(null);
+
+  const yMin   = Math.min(...displayValues);
+  const yRange = Math.max(...displayValues) - yMin || 1;
+  const markerY = yMin - yRange * 0.06;
+
+  Object.values(markerMap).forEach(({ idx, buys, sells }) => {
+    const hasBuy  = buys.length > 0;
+    const hasSell = sells.length > 0;
+    markerData[idx]   = markerY;
+    markerColors[idx] = hasBuy && hasSell ? "#a78bfa"
+                      : hasBuy            ? "#60a5fa"
+                                          : "#fb923c";
+    markerMeta[idx] = { buys, sells };
+  });
+
+  const markerDataset = {
+    label: "trades",
+    data: markerData,
+    pointStyle: "rectRot",
+    pointRadius: markerData.map(v => v !== null ? 7 : 0),
+    pointHoverRadius: markerData.map(v => v !== null ? 9 : 0),
+    pointBackgroundColor: markerColors,
+    pointBorderColor: markerColors,
+    borderWidth: 0,
+    backgroundColor: "transparent",
+    showLine: false,
+    fill: false,
+    order: 1,
+    _tradeMeta: markerMeta,
+  };
+
+  return [mainDataset, markerDataset];
 }
 
-function renderPortfolioChart(labels, values, costBases) {
+function renderPortfolioChart(labels, values, costBases, trades) {
   const canvas      = document.getElementById("portfolio-chart");
   const placeholder = document.getElementById("chart-placeholder");
   if (!canvas) return;
@@ -501,9 +559,11 @@ function renderPortfolioChart(labels, values, costBases) {
   if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
 
   const ctx = canvas.getContext("2d");
-  const datasets = buildChartDatasets(ctx, values, costBases, currentChartMode);
+  const datasets = buildChartDatasets(ctx, labels, values, costBases, trades, currentChartMode);
   const sym   = currencySymbol();
   const isPct = currentChartMode === "pct";
+
+  const tradeDataset = datasets.find(d => d.label === "trades");
 
   const formattedLabels = labels.map(l => {
     try {
@@ -530,9 +590,27 @@ function renderPortfolioChart(labels, values, costBases) {
           titleFont: { family: "'IBM Plex Mono'", size: 11 },
           bodyFont:  { family: "'IBM Plex Mono'", size: 12 },
           padding: 10,
+          filter: item => {
+            if (item.dataset.label === "trades") return item.parsed.y !== null;
+            return true;
+          },
           callbacks: {
-            label: ctx => {
-              const v = ctx.parsed.y;
+            label: item => {
+              if (item.dataset.label === "trades") {
+                const meta = tradeDataset && tradeDataset._tradeMeta
+                  ? tradeDataset._tradeMeta[item.dataIndex]
+                  : null;
+                if (!meta) return "";
+                const lines = [];
+                meta.buys.forEach(t =>
+                  lines.push(` ◆ BUY  ${fmt(t.quantity, 4)} ${t.ticker} @ ${fmt(t.price, 2)} ${t.currency}`)
+                );
+                meta.sells.forEach(t =>
+                  lines.push(` ◆ SELL ${fmt(t.quantity, 4)} ${t.ticker} @ ${fmt(t.price, 2)} ${t.currency}`)
+                );
+                return lines;
+              }
+              const v = item.parsed.y;
               return isPct
                 ? ` ${v >= 0 ? "+" : ""}${fmt(v, 2)}%`
                 : ` ${fmt(v, 2)}${sym}`;
@@ -576,13 +654,14 @@ async function loadPortfolioChart() {
     const labels = data.labels || [];
     const values = data.values || [];
     const costBases = data.cost_bases || [];
+    const trades = data.trades || [];
     if (!labels.length || !values.length) {
       placeholder.style.display = "flex";
       placeholderText.textContent = "No portfolio data for this period.";
       if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
       return;
     }
-    renderPortfolioChart(labels, values, costBases);
+    renderPortfolioChart(labels, values, costBases, trades);
   } catch (e) {
     console.warn("Portfolio history fetch failed:", e);
     placeholder.style.display = "flex";
