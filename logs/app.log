@@ -298,3 +298,56 @@
 2026-03-30 23:18:33,476 | INFO | Retrieved cached FX rate: USD_EUR = 0.87078
 2026-03-30 23:19:06,398 | INFO | Retrieved cached FX rate: USD_EUR = 0.87078
 2026-03-30 23:20:05,405 | INFO | Retrieved cached FX rate: USD_EUR = 0.87078
+2026-03-30 23:43:37,897 | INFO | Bootstrap: initial ticker sync …
+2026-03-30 23:43:37,897 | INFO | update_all_tickers: updating 3 ticker(s)
+2026-03-30 23:43:37,898 | INFO | update_ticker: AAPL already up to date
+2026-03-30 23:43:37,899 | INFO | update_ticker: MSFT already up to date
+2026-03-30 23:43:37,900 | INFO | update_ticker: GOOGL already up to date
+2026-03-30 23:43:37,900 | INFO | update_all_tickers: done
+2026-03-30 23:43:37,900 | INFO | Bootstrap: done.
+2026-03-30 23:43:37,900 | INFO | Daily update thread started.
+2026-03-30 23:43:37,903 | INFO | Daily update: all tickers up to date.
+2026-03-30 23:44:05,662 | INFO | Bootstrap: initial ticker sync …
+2026-03-30 23:44:05,663 | INFO | update_all_tickers: updating 3 ticker(s)
+2026-03-30 23:44:05,664 | INFO | update_ticker: AAPL already up to date
+2026-03-30 23:44:05,664 | INFO | update_ticker: MSFT already up to date
+2026-03-30 23:44:05,665 | INFO | update_ticker: GOOGL already up to date
+2026-03-30 23:44:05,665 | INFO | update_all_tickers: done
+2026-03-30 23:44:05,665 | INFO | Bootstrap: done.
+2026-03-30 23:44:05,666 | INFO | Daily update thread started.
+2026-03-30 23:44:05,668 | INFO | Daily update: all tickers up to date.
+2026-03-30 23:44:11,810 | INFO | Saved FX rate: USD_EUR = 0.87078 from ECB
+2026-03-30 23:44:11,810 | INFO | [API] FX USD->EUR = 0.87078
+2026-03-30 23:44:11,823 | INFO | Saved FX rate: USD_EUR = 0.87078 from ECB
+2026-03-30 23:44:11,823 | INFO | [API] FX USD->EUR = 0.87078
+2026-03-30 23:44:11,839 | INFO | Saved FX rate: USD_EUR = 0.87078 from ECB
+2026-03-30 23:44:11,839 | INFO | [API] FX USD->EUR = 0.87078
+2026-03-30 23:44:11,849 | INFO | Retrieved cached FX rate: USD_EUR = 0.87078
+2026-03-30 23:44:36,957 | INFO | export_csv: building CSV
+2026-03-30 23:44:50,510 | INFO | Retrieved cached FX rate: USD_EUR = 0.87078
+2026-03-30 23:45:25,097 | INFO | Bootstrap: initial ticker sync …
+2026-03-30 23:45:25,099 | INFO | update_all_tickers: no tickers in DB
+2026-03-30 23:45:25,099 | INFO | Bootstrap: done.
+2026-03-30 23:45:25,099 | INFO | Daily update thread started.
+2026-03-30 23:45:25,100 | INFO | Daily update: all tickers up to date.
+2026-03-30 23:45:33,409 | INFO | import_csv: received file 'trades_export_2026-03-30.csv' (334 bytes)
+2026-03-30 23:45:33,413 | INFO | Trade logged: BUY 4.0 AAPL @ 145.0
+2026-03-30 23:45:33,418 | INFO | Trade logged: BUY 4.0 MSFT @ 245.0
+2026-03-30 23:45:33,422 | INFO | Trade logged: SELL 2.0 AAPL @ 214.0
+2026-03-30 23:45:33,427 | INFO | Trade logged: BUY 4.0 GOOGL @ 195.0
+2026-03-30 23:45:33,431 | INFO | Trade logged: BUY 12.0 AAPL @ 195.0
+2026-03-30 23:45:35,301 | INFO | bootstrap_ticker: fetching AAPL from 2025-05-07
+2026-03-30 23:45:37,521 | INFO | bootstrap_ticker: AAPL saved 225 rows
+2026-03-30 23:45:37,851 | INFO | bootstrap_ticker: fetching GOOGL from 2025-07-01
+2026-03-30 23:45:38,516 | INFO | bootstrap_ticker: GOOGL saved 188 rows
+2026-03-30 23:45:38,840 | INFO | bootstrap_ticker: fetching MSFT from 2026-02-01
+2026-03-30 23:45:39,674 | INFO | bootstrap_ticker: MSFT saved 40 rows
+2026-03-30 23:45:39,674 | INFO | import_csv: imported=5, skipped=0
+2026-03-30 23:45:44,083 | INFO | Saved FX rate: USD_EUR = 0.87078 from ECB
+2026-03-30 23:45:44,083 | INFO | [API] FX USD->EUR = 0.87078
+2026-03-30 23:45:44,093 | INFO | Saved FX rate: USD_EUR = 0.87078 from ECB
+2026-03-30 23:45:44,093 | INFO | [API] FX USD->EUR = 0.87078
+2026-03-30 23:45:44,097 | INFO | Saved FX rate: USD_EUR = 0.87078 from ECB
+2026-03-30 23:45:44,097 | INFO | [API] FX USD->EUR = 0.87078
+2026-03-30 23:45:44,108 | INFO | Retrieved cached FX rate: USD_EUR = 0.87078
+2026-03-30 23:46:15,726 | INFO | Retrieved cached FX rate: USD_EUR = 0.87078
