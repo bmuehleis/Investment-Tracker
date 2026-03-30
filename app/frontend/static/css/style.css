@@ -681,3 +681,79 @@ input[type=date]::-webkit-calendar-picker-indicator { filter: invert(0.5); curso
   opacity: 1;
   transform: translateX(0);
 }
+/* ── Trades toolbar (export / import) ───────────────────────────── */
+.section-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.section-header-row h2 {
+  margin-bottom: 0;
+}
+.trades-toolbar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+.btn-secondary:hover {
+  background: var(--surface-hover, rgba(255,255,255,0.06));
+  border-color: var(--accent);
+}
+.btn-import-label {
+  cursor: pointer;
+}
+
+/* ── Import result banner ────────────────────────────────────────── */
+.import-banner {
+  margin-bottom: 12px;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.import-banner.success { background: rgba(0,200,100,0.10); border: 1px solid rgba(0,200,100,0.30); color: #5fdd9d; }
+.import-banner.warning { background: rgba(255,180,0,0.10);  border: 1px solid rgba(255,180,0,0.30);  color: #f5c842; }
+.import-banner.error   { background: rgba(255,80,80,0.10);  border: 1px solid rgba(255,80,80,0.30);  color: #f87171; }
+
+/* ── Sortable table headers ──────────────────────────────────────── */
+th.sortable {
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+th.sortable:hover {
+  color: var(--accent);
+}
+th.sortable .sort-icon {
+  opacity: 0.35;
+  font-size: 11px;
+  margin-left: 3px;
+  transition: opacity 0.15s;
+}
+th.sortable:hover .sort-icon {
+  opacity: 0.7;
+}
+th.sort-asc  .sort-icon { opacity: 1; content: "↑"; }
+th.sort-desc .sort-icon { opacity: 1; content: "↓"; }
+th.sort-asc  .sort-icon::after { content: " ↑"; }
+th.sort-desc .sort-icon::after { content: " ↓"; }
+th.sort-asc  .sort-icon { visibility: hidden; }
+th.sort-desc .sort-icon { visibility: hidden; }
+th.sort-asc::after  { content: " ↑"; font-size: 11px; opacity: 0.9; }
+th.sort-desc::after { content: " ↓"; font-size: 11px; opacity: 0.9; }

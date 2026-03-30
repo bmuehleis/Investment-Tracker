@@ -1,5 +1,3 @@
-from matplotlib import ticker
-
 from app.core.database import get_connection
 from app.core.logger import setup_logger
 import sqlite3
@@ -202,3 +200,16 @@ def get_trades_up_to(ticker: str, cutoff: str) -> list[dict]:
     except Exception as e:
         logger.error(f"Error fetching trades for {ticker} up to {cutoff}: {e}")
         return []
+
+def get_oldest_trade_date_for_ticker(ticker: str) -> str | None:
+    """Return the date of the oldest trade for a specific ticker, or None."""
+    try:
+        with get_connection() as conn:
+            row = conn.execute(
+                "SELECT MIN(date) FROM transactions WHERE ticker = ?",
+                (ticker,)
+            ).fetchone()
+            return row[0] if row and row[0] else None
+    except Exception as e:
+        logger.error(f"Error fetching oldest trade date for {ticker}: {e}")
+        return None

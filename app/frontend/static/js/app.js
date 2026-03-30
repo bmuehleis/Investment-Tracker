@@ -756,22 +756,86 @@ function buildTradeRow(trade) {
   `;
 }
 
+// ── Trades sort state ─────────────────────────────────────────────
+let _sortCol = "date";
+let _sortDir = -1;  // -1 = desc (newest first by default), +1 = asc
+
+function _sortTrades(trades) {
+  return [...trades].sort((a, b) => {
+    let va = a[_sortCol];
+    let vb = b[_sortCol];
+
+    // Computed "total" column
+    if (_sortCol === "total") {
+      va = (parseFloat(a.quantity) || 0) * (parseFloat(a.price) || 0);
+      vb = (parseFloat(b.quantity) || 0) * (parseFloat(b.price) || 0);
+    }
+
+    // Numeric compare
+    const na = parseFloat(va), nb = parseFloat(vb);
+    if (!isNaN(na) && !isNaN(nb)) return _sortDir * (na - nb);
+
+    // String compare
+    const sa = String(va ?? "").toLowerCase();
+    const sb = String(vb ?? "").toLowerCase();
+    return _sortDir * sa.localeCompare(sb);
+  });
+}
+
+function _updateSortHeaders() {
+  document.querySelectorAll("#trades-table th.sortable").forEach(th => {
+    th.classList.remove("sort-asc", "sort-desc");
+    const icon = th.querySelector(".sort-icon");
+    if (icon) icon.textContent = "⇅";
+    if (th.dataset.col === _sortCol) {
+      const cls = _sortDir === 1 ? "sort-asc" : "sort-desc";
+      th.classList.add(cls);
+      if (icon) icon.textContent = _sortDir === 1 ? "↑" : "↓";
+    }
+  });
+}
+
 async function loadTrades() {
   const tbody = document.getElementById("trades-body");
   tbody.innerHTML = `<tr><td colspan="10" class="empty">Loading...</td></tr>`;
 
   try {
     const trades = await fetchTrades();
+    _tradesCache = trades;
     if (!trades.length) {
       tbody.innerHTML = `<tr><td colspan="10" class="empty">No trades yet.</td></tr>`;
       return;
     }
-    tbody.innerHTML = [...trades].reverse().map(buildTradeRow).join("");
+    tbody.innerHTML = _sortTrades(trades).map(buildTradeRow).join("");
+    _updateSortHeaders();
   } catch (e) {
     tbody.innerHTML = `<tr><td colspan="10" class="empty">Error loading trades.</td></tr>`;
     console.error(e);
   }
 }
+
+// Wire up sortable column headers (delegated — works after DOM ready)
+document.addEventListener("click", (e) => {
+  const th = e.target.closest("th.sortable");
+  if (!th) return;
+  const col = th.dataset.col;
+  if (!col) return;
+
+  if (_sortCol === col) {
+    // Second click on same column: toggle direction
+    _sortDir *= -1;
+  } else {
+    _sortCol = col;
+    _sortDir = 1; // first click = ascending
+  }
+
+  // Re-render from cache without a network round-trip
+  const tbody = document.getElementById("trades-body");
+  if (_tradesCache.length) {
+    tbody.innerHTML = _sortTrades(_tradesCache).map(buildTradeRow).join("");
+  }
+  _updateSortHeaders();
+});
 
 // ── Edit trade modal ──────────────────────────────────────
 
@@ -987,8 +1051,91 @@ document.getElementById("add-form").addEventListener("submit", async (e) => {
   }
 });
 
-// ── Init ──────────────────────────────────────────────────
+// ── CSV Export ────────────────────────────────────────────────────
+document.addEventListener("click", async (e) => {
+  if (!e.target.closest("#btn-export-csv")) return;
+  try {
+    const res = await fetch(`${API}/trades/export`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const blob = await res.blob();
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement("a");
+    a.href     = url;
+    a.download = `trades_export_${new Date().toISOString().slice(0,10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    showToast("Trades exported as CSV.");
+  } catch (err) {
+    showToast(`Export failed: ${err.message}`);
+    console.error(err);
+  }
+});
 
+// ── CSV Import ────────────────────────────────────────────────────
+document.addEventListener("change", async (e) => {
+  const input = e.target.closest("#input-import-csv");
+  if (!input || !input.files.length) return;
+
+  const file    = input.files[0];
+  const banner  = document.getElementById("import-result-banner");
+  banner.style.display = "none";
+  banner.className = "import-banner";
+
+  const formData = new FormData();
+  formData.append("file", file);
+
+  try {
+    showToast("Importing trades…");
+    const res  = await fetch(`${API}/trades/import`, { method: "POST", body: formData });
+    const data = await res.json();
+
+    if (!res.ok) {
+      banner.className += " error";
+      banner.textContent = `Import failed: ${data.detail || "Unknown error."}`;
+      banner.style.display = "block";
+      showToast("Import failed.");
+      return;
+    }
+
+    const { imported, skipped, errors } = data;
+    const hasErrors = errors && errors.length > 0;
+
+    if (imported > 0 && !hasErrors) {
+      banner.className += " success";
+    } else if (imported > 0 && hasErrors) {
+      banner.className += " warning";
+    } else {
+      banner.className += " error";
+    }
+
+    let msg = `Imported ${imported} trade${imported !== 1 ? "s" : ""}`;
+    if (skipped > 0) msg += `, skipped ${skipped}`;
+    msg += ".";
+    if (hasErrors) {
+      msg += "\n" + errors.slice(0, 10).join("\n");
+      if (errors.length > 10) msg += `\n…and ${errors.length - 10} more.`;
+    }
+    banner.textContent = msg;
+    banner.style.display = "block";
+
+    showToast(`Imported ${imported} trade${imported !== 1 ? "s" : ""}.`);
+    _tradesCache = [];
+    if (imported > 0) loadTrades();
+  } catch (err) {
+    banner.className += " error";
+    banner.textContent = `Import error: ${err.message}`;
+    banner.style.display = "block";
+    showToast(`Import error: ${err.message}`);
+    console.error(err);
+  } finally {
+    // Reset file input so the same file can be re-imported if needed
+    input.value = "";
+  }
+});
+
+// ── Init ──────────────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
   loadDashboard();
 });
