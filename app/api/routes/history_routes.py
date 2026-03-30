@@ -12,7 +12,10 @@ from datetime import date, timedelta
 from fastapi import APIRouter, Query
 from app.core.logger import setup_logger
 from app.repositories.trades_repository import get_all_tickers, get_first_trade_date
-from app.services.portfolio_service import calculate_portfolio_value_on_day
+from app.services.portfolio_service import (
+    calculate_portfolio_value_on_day,
+    calculate_portfolio_cost_basis_on_day,
+)
 
 logger = setup_logger()
 router = APIRouter()
@@ -120,17 +123,26 @@ def portfolio_history(
 
     labels = []
     values = []
+    cost_bases = []
 
     for day in sample_days:
         day_str = day.isoformat()
         val = calculate_portfolio_value_on_day(tickers, day_str, currency)
         if val is not None:
+            cb = calculate_portfolio_cost_basis_on_day(tickers, day_str, currency)
             labels.append(day_str)
             values.append(round(val, 2))
+            cost_bases.append(round(cb, 2))
+
+    # Today's market value (used by the dashboard Portfolio Value card)
+    today_str = today.isoformat()
+    today_value = calculate_portfolio_value_on_day(tickers, today_str, currency)
 
     return {
         "labels": labels,
         "values": values,
+        "cost_bases": cost_bases,
+        "today_value": round(today_value, 2) if today_value is not None else None,
         "first_trade_date": first_trade_str,
         "currency": currency,
     }

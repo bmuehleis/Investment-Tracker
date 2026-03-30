@@ -12,6 +12,7 @@ A personal investment tracking application built to run with a fully self-manage
   - Realized gains  
   - Unrealized gains  
   - Total gains  
+- Portfolio performance graph (functionality has known bugs)
 - Overview of open positions  
 - Monitor gains/losses per open position  
 - Full FX rate compatibility:
@@ -20,7 +21,6 @@ A personal investment tracking application built to run with a fully self-manage
 ---
 
 ### 🔧 Planned Features
-- Portfolio performance graph (UI exists, functionality in progress)  
 - Analytics dashboard:
   - Portfolio benchmarking  
   - Key performance indicators (KPIs)  

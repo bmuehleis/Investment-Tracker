@@ -212,3 +212,49 @@
 2026-03-29 18:25:45,964 | INFO | Retrieved cached FX rate: USD_EUR = 0.86828
 2026-03-29 18:26:42,508 | INFO | Retrieved cached FX rate: USD_EUR = 0.86828
 2026-03-29 18:29:15,790 | INFO | Retrieved cached FX rate: USD_EUR = 0.86828
+2026-03-30 22:44:02,599 | INFO | Starting initial data sync...
+2026-03-30 22:44:02,601 | INFO | Fetching AAPL...
+2026-03-30 22:44:05,235 | INFO | AAPL updated successfully
+2026-03-30 22:44:05,237 | INFO | Fetching GOOGL...
+2026-03-30 22:44:06,025 | INFO | GOOGL updated successfully
+2026-03-30 22:44:06,027 | INFO | Fetching MSFT...
+2026-03-30 22:44:06,873 | INFO | MSFT updated successfully
+2026-03-30 22:44:06,874 | INFO | Initial sync completed.
+2026-03-30 22:44:09,299 | INFO | Saved FX rate: USD_EUR = 0.87078 from ECB
+2026-03-30 22:44:09,300 | INFO | [API] FX USD->EUR = 0.87078
+2026-03-30 22:44:09,308 | INFO | Saved FX rate: USD_EUR = 0.87078 from ECB
+2026-03-30 22:44:09,308 | INFO | [API] FX USD->EUR = 0.87078
+2026-03-30 22:44:09,323 | INFO | Saved FX rate: USD_EUR = 0.87078 from ECB
+2026-03-30 22:44:09,323 | INFO | [API] FX USD->EUR = 0.87078
+2026-03-30 22:44:09,856 | INFO | Retrieved cached FX rate: USD_EUR = 0.87078
+2026-03-30 22:45:13,049 | INFO | Trade logged: buy 12.0 AAPL @ 195.0
+2026-03-30 22:45:44,654 | INFO | Trade logged: sell 2.0 AAPL @ 214.0
+2026-03-30 22:46:52,726 | INFO | Trade logged: buy 3.0 MSFT @ 190.0
+2026-03-30 22:46:54,501 | INFO | Retrieved cached FX rate: USD_EUR = 0.87078
+2026-03-30 22:48:12,402 | INFO | Trade with ID 6 updated successfully.
+2026-03-30 22:48:15,895 | INFO | Retrieved cached FX rate: USD_EUR = 0.87078
+2026-03-30 22:48:27,849 | INFO | Trade with ID 6 deleted successfully.
+2026-03-30 22:48:58,451 | INFO | Trade logged: buy 4.0 GOOGL @ 195.0
+2026-03-30 22:49:00,785 | INFO | Retrieved cached FX rate: USD_EUR = 0.87078
+2026-03-30 22:49:36,275 | INFO | Retrieved cached FX rate: USD_EUR = 0.87078
+2026-03-30 22:50:05,285 | INFO | Trade with ID 3 deleted successfully.
+2026-03-30 22:50:07,677 | INFO | Retrieved cached FX rate: USD_EUR = 0.87078
+2026-03-30 22:50:30,413 | INFO | Trade with ID 2 updated successfully.
+2026-03-30 23:02:32,346 | INFO | Starting initial data sync...
+2026-03-30 23:02:32,347 | INFO | AAPL already up to date
+2026-03-30 23:02:32,348 | INFO | GOOGL already up to date
+2026-03-30 23:02:32,348 | INFO | MSFT already up to date
+2026-03-30 23:02:32,349 | INFO | Initial sync completed.
+2026-03-30 23:02:35,253 | INFO | Saved FX rate: USD_EUR = 0.87078 from ECB
+2026-03-30 23:02:35,253 | INFO | [API] FX USD->EUR = 0.87078
+2026-03-30 23:02:35,266 | INFO | Saved FX rate: USD_EUR = 0.87078 from ECB
+2026-03-30 23:02:35,266 | INFO | [API] FX USD->EUR = 0.87078
+2026-03-30 23:02:35,282 | INFO | Saved FX rate: USD_EUR = 0.87078 from ECB
+2026-03-30 23:02:35,282 | INFO | [API] FX USD->EUR = 0.87078
+2026-03-30 23:02:35,317 | INFO | Retrieved cached FX rate: USD_EUR = 0.87078
+2026-03-30 23:03:06,040 | INFO | Retrieved cached FX rate: USD_EUR = 0.87078
+2026-03-30 23:03:43,368 | INFO | Retrieved cached FX rate: USD_EUR = 0.87078
+2026-03-30 23:04:54,829 | INFO | Retrieved cached FX rate: USD_EUR = 0.87078
+2026-03-30 23:06:00,328 | INFO | Retrieved cached FX rate: USD_EUR = 0.87078
+2026-03-30 23:06:39,359 | INFO | Retrieved cached FX rate: USD_EUR = 0.87078
+2026-03-30 23:07:13,306 | INFO | Retrieved cached FX rate: USD_EUR = 0.87078

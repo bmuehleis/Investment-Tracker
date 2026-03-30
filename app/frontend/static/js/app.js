@@ -250,26 +250,16 @@ async function loadDashboard() {
       totalVal  !== null ? toPreferred(totalVal,  apiCurrency) : Promise.resolve(null),
     ]);
 
-    // Portfolio value derived from trades
+    // Portfolio value: use today's market value from the history endpoint
+    // (this is holdings × current price, not cost basis + unrealised PnL)
     let portfolioVal = null;
     try {
-      const trades = await fetchTrades();
-
-      // Sum cost basis per currency then convert each bucket
-      const buckets = {};
-      for (const t of trades) {
-        if ((t.action || "buy").toLowerCase() !== "buy") continue;
-        const cur = (t.currency || PREFERRED_CURRENCY).toUpperCase();
-        buckets[cur] = (buckets[cur] || 0) + (t.quantity ?? 0) * (t.price ?? 0);
+      const histData = await fetchPortfolioHistory("1W", null, null);
+      if (histData && histData.today_value !== null && histData.today_value !== undefined) {
+        portfolioVal = histData.today_value;
+      } else if (histData && histData.values && histData.values.length > 0) {
+        portfolioVal = histData.values[histData.values.length - 1];
       }
-
-      let invested = 0;
-      for (const [cur, amount] of Object.entries(buckets)) {
-        const converted = await toPreferred(amount, cur);
-        if (converted !== null) invested += converted;
-      }
-
-      portfolioVal = invested + (unrealConv ?? 0);
     } catch {}
 
     const setCard = (id, subId, val, basisForPct = null) => {
@@ -446,13 +436,29 @@ async function fetchPortfolioHistory(win, fromDate, toDate) {
   return res.json();
 }
 
-function buildChartDatasets(ctx, values, mode) {
+function buildChartDatasets(ctx, values, costBases, mode) {
   if (!values.length) return [];
 
-  let displayValues = values;
+  let displayValues;
   if (mode === "pct") {
-    const base = values[0];
-    displayValues = values.map(v => base !== 0 ? ((v - base) / Math.abs(base)) * 100 : 0);
+    // Percentage return = (market_value - cost_basis) / cost_basis * 100
+    // This shows pure price appreciation relative to what was paid,
+    // unaffected by purchases or sales of shares.
+    displayValues = values.map((v, i) => {
+      const cb = (costBases && costBases[i]) ? costBases[i] : null;
+      if (cb === null || cb === 0) return 0;
+      return ((v - cb) / Math.abs(cb)) * 100;
+    });
+  } else {
+    // Price-return series: remove the effect of capital flows.
+    // We show (market_value - cost_basis) + initial_cost_basis so the line
+    // starts at the initial investment and moves only with price changes.
+    const initialCostBasis = (costBases && costBases.length > 0) ? costBases[0] : values[0];
+    displayValues = values.map((v, i) => {
+      const cb = (costBases && costBases[i] !== undefined) ? costBases[i] : initialCostBasis;
+      const unrealised = v - cb;
+      return initialCostBasis + unrealised;
+    });
   }
 
   const netChange = displayValues[displayValues.length - 1] - displayValues[0];
@@ -479,7 +485,7 @@ function buildChartDatasets(ctx, values, mode) {
   }];
 }
 
-function renderPortfolioChart(labels, values) {
+function renderPortfolioChart(labels, values, costBases) {
   const canvas      = document.getElementById("portfolio-chart");
   const placeholder = document.getElementById("chart-placeholder");
   if (!canvas) return;
@@ -495,7 +501,7 @@ function renderPortfolioChart(labels, values) {
   if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
 
   const ctx = canvas.getContext("2d");
-  const datasets = buildChartDatasets(ctx, values, currentChartMode);
+  const datasets = buildChartDatasets(ctx, values, costBases, currentChartMode);
   const sym   = currencySymbol();
   const isPct = currentChartMode === "pct";
 
@@ -569,13 +575,14 @@ async function loadPortfolioChart() {
     const data = await fetchPortfolioHistory(currentWindow, _chartFromDate, _chartToDate);
     const labels = data.labels || [];
     const values = data.values || [];
+    const costBases = data.cost_bases || [];
     if (!labels.length || !values.length) {
       placeholder.style.display = "flex";
       placeholderText.textContent = "No portfolio data for this period.";
       if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
       return;
     }
-    renderPortfolioChart(labels, values);
+    renderPortfolioChart(labels, values, costBases);
   } catch (e) {
     console.warn("Portfolio history fetch failed:", e);
     placeholder.style.display = "flex";
