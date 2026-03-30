@@ -27,20 +27,23 @@ def save_fx_rate(from_currency, to_currency, rate, provider):
 
 def get_cached_fx_rate(from_currency, to_currency):
     pair = f"{from_currency}_{to_currency}"
-
-    try:
-        with get_connection() as conn:
-            cursor = conn.cursor()
-            row = cursor.execute(
-                "SELECT rate FROM fx_rates WHERE pair = ?",
-                (pair,)
-            ).fetchone()
-            rate = row[0] if row else None
-            if rate:
-                logger.info(f"Retrieved cached FX rate: {pair} = {rate}", cooldown=30, key=f"fx_rate_{pair}")
-            else:
-                logger.warning(f"No cached FX rate found for {pair}", cooldown=30, key=f"fx_rate_{pair}")
-            return rate
-    except Exception as e:
-        logger.error(f"Failed to retrieve FX rate for {pair}: {str(e)}")
-        return None
+    
+    if (from_currency == to_currency):
+        return 1.0
+    else:
+        try:
+            with get_connection() as conn:
+                cursor = conn.cursor()
+                row = cursor.execute(
+                    "SELECT rate FROM fx_rates WHERE pair = ?",
+                    (pair,)
+                ).fetchone()
+                rate = row[0] if row else None
+                if rate:
+                    logger.info(f"Retrieved cached FX rate: {pair} = {rate}", cooldown=30, key=f"fx_rate_{pair}")
+                else:
+                    logger.warning(f"No cached FX rate found for {pair}", cooldown=30, key=f"fx_rate_{pair}")
+                return rate
+        except Exception as e:
+            logger.error(f"Failed to retrieve FX rate for {pair}: {str(e)}")
+            return None
