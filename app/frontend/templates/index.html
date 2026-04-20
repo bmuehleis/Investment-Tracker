@@ -19,7 +19,7 @@
     <div class="logo">◈ Investment Tracker</div>
     <nav>
       <button class="nav-btn active" data-tab="dashboard">Dashboard</button>
-      <button class="nav-btn" data-tab="analytics">Analytics</button>
+      <button class="nav-btn" data-tab="benchmark">Benchmark</button>
       <button class="nav-btn" data-tab="trades">Trades</button>
       <button class="nav-btn" data-tab="add">Add Trade</button>
       <button class="nav-btn" data-tab="watchlist">Watchlist</button>
@@ -373,7 +373,91 @@
     </section>
   </main>
 
-  <!-- ── ANALYTICS TAB ── -->
+  <!-- ── BENCHMARK TAB ── -->
+  <main id="tab-benchmark" class="tab">
+
+    <!-- Controls row -->
+    <div class="benchmark-controls">
+      <div class="benchmark-controls-left">
+        <h2 class="section-title-inline">Benchmark</h2>
+        <div class="period-tabs" id="benchmark-period-tabs">
+          <button class="period-btn active" data-period="1y">1Y</button>
+          <button class="period-btn" data-period="3y">3Y</button>
+          <button class="period-btn" data-period="5y">5Y</button>
+          <button class="period-btn" data-period="10y">10Y</button>
+          <button class="period-btn" data-period="max">MAX</button>
+        </div>
+      </div>
+      <div class="benchmark-controls-right">
+        <span class="benchmark-label-text">Compare with:</span>
+        <div class="benchmark-selector" id="benchmark-selector">
+          <!-- populated by JS -->
+        </div>
+        <select class="bm-currency-select" id="bm-currency-select">
+          <option value="EUR">EUR</option>
+          <option value="USD">USD</option>
+          <option value="GBP">GBP</option>
+          <option value="CHF">CHF</option>
+          <option value="JPY">JPY</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Loading / error state -->
+    <div id="benchmark-loading" class="bm-loading" style="display:none;">
+      <div class="bm-spinner"></div>
+      <span>Loading benchmark data…</span>
+    </div>
+    <div id="benchmark-error" class="bm-error" style="display:none;"></div>
+
+    <!-- KPI comparison cards (portfolio vs selected benchmarks) -->
+    <div id="benchmark-kpi-area">
+
+      <!-- Period summary table (all periods, portfolio only) -->
+      <section class="section bm-section" id="bm-period-section">
+        <h3 class="bm-section-title">Period Overview — Portfolio</h3>
+        <div class="bm-table-wrap">
+          <table class="bm-table" id="bm-all-periods-table">
+            <thead>
+              <tr>
+                <th>Period</th>
+                <th class="num">Total Return</th>
+                <th class="num">Ann. Return</th>
+                <th class="num">Ann. Variance</th>
+                <th class="num">Sharpe Ratio</th>
+                <th class="num">Sortino Ratio</th>
+              </tr>
+            </thead>
+            <tbody id="bm-all-periods-tbody">
+              <tr><td colspan="6" class="bm-empty">Select a period to load data.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Current period deep-dive with benchmark comparison -->
+      <section class="section bm-section" id="bm-comparison-section">
+        <h3 class="bm-section-title" id="bm-comparison-title">Current Period KPIs</h3>
+        <div class="bm-table-wrap">
+          <table class="bm-table" id="bm-comparison-table">
+            <thead>
+              <tr>
+                <th>Metric</th>
+                <th class="num" id="bm-col-portfolio">Portfolio</th>
+                <!-- benchmark columns added dynamically -->
+              </tr>
+            </thead>
+            <tbody id="bm-comparison-tbody">
+              <tr><td colspan="2" class="bm-empty">Select a period above to load data.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- ── ANALYTICS TAB (kept for backward compat) ── -->
   <main id="tab-analytics" class="tab">
     <section class="section placeholder-section">
       <h2>Analytics</h2>

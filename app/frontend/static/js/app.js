@@ -1139,3 +1139,295 @@ document.addEventListener("change", async (e) => {
 document.addEventListener("DOMContentLoaded", () => {
   loadDashboard();
 });
+// ══════════════════════════════════════════════════════════════════════════════
+// BENCHMARK TAB
+// ══════════════════════════════════════════════════════════════════════════════
+
+const BM = {
+  period:          "1y",
+  currency:        null,           // falls back to PREFERRED_CURRENCY
+  selectedKeys:    new Set(),      // benchmark keys currently toggled on
+  available:       [],             // [{key, label}] fetched from API
+  allPeriodsCache: null,           // cached all-period portfolio data
+  loading:         false,
+};
+
+// ── Colour map per benchmark key ─────────────────────────────────────────────
+const BM_COLORS = {
+  sp500:      "#fbbf24",   // amber
+  msci_world: "#a78bfa",   // violet
+};
+
+// ── DOM helpers ───────────────────────────────────────────────────────────────
+
+function bmSetLoading(on) {
+  BM.loading = on;
+  document.getElementById("benchmark-loading").style.display = on ? "flex" : "none";
+  document.getElementById("benchmark-kpi-area").style.opacity = on ? "0.3" : "1";
+}
+
+function bmShowError(msg) {
+  const el = document.getElementById("benchmark-error");
+  if (msg) { el.textContent = msg; el.style.display = "block"; }
+  else      { el.style.display = "none"; }
+}
+
+// ── Formatting helpers ────────────────────────────────────────────────────────
+
+function bmFmtPct(val, showSign = true) {
+  if (val === null || val === undefined || isNaN(val)) return "—";
+  const sign = showSign && val > 0 ? "+" : "";
+  return `${sign}${Number(val).toFixed(2)}%`;
+}
+
+function bmFmtNum(val, decimals = 2) {
+  if (val === null || val === undefined || isNaN(val)) return "—";
+  const sign = val > 0 ? "+" : "";
+  return `${sign}${Number(val).toFixed(decimals)}`;
+}
+
+function bmColorClass(val) {
+  if (val === null || val === undefined || isNaN(val)) return "val-neu";
+  return val > 0 ? "val-pos" : val < 0 ? "val-neg" : "val-neu";
+}
+
+function bmCell(val, fmt) {
+  const cls = bmColorClass(val);
+  return `<td class="num ${cls}">${fmt(val)}</td>`;
+}
+
+// ── Initialise benchmark selector chips ──────────────────────────────────────
+
+async function bmInitSelector() {
+  try {
+    const res  = await fetch(`${API}/benchmark/available`);
+    const data = await res.json();
+    BM.available = data.benchmarks || [];
+  } catch {
+    BM.available = [];
+  }
+
+  const container = document.getElementById("benchmark-selector");
+  container.innerHTML = "";
+  BM.available.forEach(({ key, label }) => {
+    const chip = document.createElement("button");
+    chip.className = "bm-chip";
+    chip.dataset.key = key;
+    chip.innerHTML = `<span class="bm-chip-dot" style="background:${BM_COLORS[key] || "var(--accent)"}"></span>${label}`;
+    chip.addEventListener("click", () => {
+      if (BM.selectedKeys.has(key)) {
+        BM.selectedKeys.delete(key);
+        chip.classList.remove("active");
+      } else {
+        BM.selectedKeys.add(key);
+        chip.classList.add("active");
+      }
+      bmLoad();
+    });
+    container.appendChild(chip);
+  });
+}
+
+// ── Period button wiring ──────────────────────────────────────────────────────
+
+document.querySelectorAll(".period-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".period-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    BM.period = btn.dataset.period;
+    BM.allPeriodsCache = null;   // invalidate
+    bmLoad();
+  });
+});
+
+// ── Currency selector ─────────────────────────────────────────────────────────
+
+document.getElementById("bm-currency-select").addEventListener("change", e => {
+  BM.currency = e.target.value;
+  BM.allPeriodsCache = null;
+  bmLoad();
+});
+
+// ── Main load ─────────────────────────────────────────────────────────────────
+
+async function bmLoad() {
+  if (BM.loading) return;
+  const currency = BM.currency || PREFERRED_CURRENCY;
+
+  bmSetLoading(true);
+  bmShowError(null);
+
+  try {
+    await Promise.all([
+      bmLoadAllPeriods(currency),
+      bmLoadComparison(currency),
+    ]);
+  } catch (err) {
+    bmShowError(`Failed to load benchmark data: ${err.message}`);
+    console.error(err);
+  } finally {
+    bmSetLoading(false);
+  }
+}
+
+// ── All-periods table ─────────────────────────────────────────────────────────
+
+const PERIOD_LABELS = { "1y": "1 Year", "3y": "3 Years", "5y": "5 Years", "10y": "10 Years", "max": "Max" };
+
+async function bmLoadAllPeriods(currency) {
+  const bmKeys = [...BM.selectedKeys];
+  const bmQuery = bmKeys.map(k => `benchmark=${encodeURIComponent(k)}`).join("&");
+  const url = `${API}/benchmark/all-periods?currency=${currency}${bmQuery ? "&" + bmQuery : ""}`;
+
+  const res  = await fetch(url);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const data = await res.json();
+  BM.allPeriodsCache = data;
+
+  const tbody = document.getElementById("bm-all-periods-tbody");
+  const periods = data.periods || {};
+  const bmPeriods = data.benchmark_periods || {};
+
+  // Build header — show benchmark columns if selected
+  const thead = document.querySelector("#bm-all-periods-table thead tr");
+  thead.innerHTML = `
+    <th>Period</th>
+    <th class="num">Total Return</th>
+    <th class="num">Ann. Return</th>
+    <th class="num">Ann. Variance</th>
+    <th class="num">Sharpe</th>
+    <th class="num">Sortino</th>
+  `;
+
+  const rows = Object.entries(PERIOD_LABELS).map(([key, label]) => {
+    const kpis = periods[key];
+    if (!kpis) {
+      return `<tr>
+        <td class="bm-period-label">${label}</td>
+        <td class="num val-neu" colspan="5">— No data for this period</td>
+      </tr>`;
+    }
+
+    const activeCls = key === BM.period ? "style='background:rgba(79,158,255,0.05)'" : "";
+
+    return `<tr ${activeCls}>
+      <td class="bm-period-label">${label}</td>
+      ${bmCell(kpis.total_return,       v => bmFmtPct(v))}
+      ${bmCell(kpis.annualised_return,  v => bmFmtPct(v))}
+      ${bmCell(kpis.variance,           v => bmFmtNum(v, 4) + "%")}
+      ${bmCell(kpis.sharpe,             v => bmFmtNum(v, 3))}
+      ${bmCell(kpis.sortino,            v => bmFmtNum(v, 3))}
+    </tr>`;
+  });
+
+  tbody.innerHTML = rows.join("");
+}
+
+// ── Comparison table (current period vs benchmarks) ───────────────────────────
+
+const METRIC_ROWS = [
+  { key: "total_return",      label: "Total Return",         fmt: v => bmFmtPct(v) },
+  { key: "annualised_return", label: "Annualised Return",    fmt: v => bmFmtPct(v) },
+  { key: "variance",          label: "Variance (Ann.)",      fmt: v => bmFmtNum(v, 4) + "%" },
+  { key: "sharpe",            label: "Sharpe Ratio",         fmt: v => bmFmtNum(v, 3) },
+  { key: "sortino",           label: "Sortino Ratio (XLM)",  fmt: v => bmFmtNum(v, 3) },
+];
+
+async function bmLoadComparison(currency) {
+  const bmKeys  = [...BM.selectedKeys];
+  const bmQuery = bmKeys.map(k => `benchmark=${encodeURIComponent(k)}`).join("&");
+  const url = `${API}/benchmark/kpis?period=${BM.period}&currency=${currency}${bmQuery ? "&" + bmQuery : ""}`;
+
+  const res  = await fetch(url);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const data = await res.json();
+
+  // Update title
+  const title = document.getElementById("bm-comparison-title");
+  const periodLabel = PERIOD_LABELS[BM.period] || BM.period;
+  const start = data.period_start ? ` (${data.period_start} → ${data.period_end})` : "";
+  title.textContent = `${periodLabel} KPI Comparison${start}`;
+
+  // Rebuild column headers
+  const headerRow = document.querySelector("#bm-comparison-table thead tr");
+  const bmCols = Object.entries(data.benchmarks || {});
+  headerRow.innerHTML = `
+    <th>Metric</th>
+    <th class="num">Portfolio</th>
+    ${bmCols.map(([key, bm]) => {
+      const color = BM_COLORS[key] || "var(--accent)";
+      return `<th class="num" style="color:${color}">${bm.label}</th>`;
+    }).join("")}
+  `;
+
+  const tbody = document.getElementById("bm-comparison-tbody");
+  const portKpis = data.portfolio_kpis;
+
+  if (!portKpis) {
+    tbody.innerHTML = `<tr><td colspan="${2 + bmCols.length}" class="bm-empty">No portfolio data for this period.</td></tr>`;
+    return;
+  }
+
+  const rows = METRIC_ROWS.map(({ key, label, fmt }) => {
+    const portVal  = portKpis[key];
+    const portCls  = bmColorClass(portVal);
+
+    const bmCells = bmCols.map(([bmKey, bm]) => {
+      const bmVal = bm.kpis?.[key];
+      const bmCls = bmColorClass(bmVal);
+      // Add delta indicator vs portfolio
+      let delta = "";
+      if (portVal !== null && bmVal !== null && !isNaN(portVal) && !isNaN(bmVal)) {
+        const diff = portVal - bmVal;
+        const diffCls = bmColorClass(diff);
+        if (Math.abs(diff) > 0.001) {
+          delta = `<span class="${diffCls}" style="font-size:10px;margin-left:4px;opacity:0.7">(${diff > 0 ? "+" : ""}${Number(diff).toFixed(2)})</span>`;
+        }
+      }
+      return `<td class="num ${bmCls}">${fmt(bmVal)}${delta}</td>`;
+    }).join("");
+
+    return `<tr>
+      <td class="metric-label">${label}</td>
+      <td class="num ${portCls}">${fmt(portVal)}</td>
+      ${bmCells}
+    </tr>`;
+  });
+
+  // Add a divider row with data range info
+  const infoRow = `<tr>
+    <td class="metric-label val-neu" style="font-size:11px">Data points</td>
+    <td class="num val-neu" style="font-size:11px">${portKpis.days ?? "—"} days</td>
+    ${bmCols.map(([, bm]) => `<td class="num val-neu" style="font-size:11px">${bm.kpis?.days ?? "—"} days</td>`).join("")}
+  </tr>`;
+
+  tbody.innerHTML = rows.join("") + infoRow;
+}
+
+// ── Wire tab switch ───────────────────────────────────────────────────────────
+
+// Patch the existing tab navigation to trigger benchmark load
+const _origTabClick = Array.from(document.querySelectorAll(".nav-btn"));
+_origTabClick.forEach(btn => {
+  btn.addEventListener("click", async () => {
+    if (btn.dataset.tab === "benchmark") {
+      if (!BM.available.length) await bmInitSelector();
+      // Sync currency selector to PREFERRED_CURRENCY if not overridden
+      if (!BM.currency) {
+        const sel = document.getElementById("bm-currency-select");
+        if (sel) sel.value = PREFERRED_CURRENCY;
+      }
+      bmLoad();
+    }
+  });
+});
+
+// Also refresh benchmark when global refresh button is clicked on benchmark tab
+const _origRefreshHandler = document.getElementById("btn-global-refresh");
+_origRefreshHandler.addEventListener("click", () => {
+  const active = document.querySelector(".tab.active")?.id?.replace("tab-", "");
+  if (active === "benchmark") {
+    BM.allPeriodsCache = null;
+    bmLoad();
+  }
+});
