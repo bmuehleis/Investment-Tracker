@@ -16,9 +16,11 @@ import yfinance as yf
 from app.core.logger import setup_logger
 from app.repositories.trades_repository import get_all_tickers, get_first_trade_date
 from app.services.portfolio_service import calculate_portfolio_value_on_day
-from app.core.config import RISK_FREE_RATE_ANNUAL
+from app.utils.risk_free import _get_risk_free_rate
 
 logger = setup_logger()
+
+RISK_FREE_RATE_ANNUAL = _get_risk_free_rate()
 
 # Benchmark tickers on Yahoo Finance
 BENCHMARKS = {
