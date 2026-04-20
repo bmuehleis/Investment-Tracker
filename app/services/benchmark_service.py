@@ -3,9 +3,8 @@ benchmark_service.py
 
 Calculates portfolio performance KPIs and fetches benchmark data for comparison.
 KPIs: Total Return (absolute + annualised), Variance (Risk), Sharpe Ratio, Sortino Ratio (XLM).
-Benchmarks: S&P 500 (^GSPC), MSCI World (URTH ETF).
+Benchmarks: S&P 500 (^GSPC), MSCI World (^990100-USD-STRD).
 
-No SQL connections — uses existing repositories and services only.
 """
 
 import math
@@ -17,16 +16,14 @@ import yfinance as yf
 from app.core.logger import setup_logger
 from app.repositories.trades_repository import get_all_tickers, get_first_trade_date
 from app.services.portfolio_service import calculate_portfolio_value_on_day
+from app.core.config import RISK_FREE_RATE_ANNUAL
 
 logger = setup_logger()
-
-# Risk-free rate (annualised, approximate ECB/Fed blended rate)
-RISK_FREE_RATE_ANNUAL = 0.03
 
 # Benchmark tickers on Yahoo Finance
 BENCHMARKS = {
     "sp500":    {"label": "S&P 500",    "ticker": "^GSPC"},
-    "msci_world": {"label": "MSCI World", "ticker": "URTH"},
+    "msci_world": {"label": "MSCI World", "ticker": "^990100-USD-STRD"},
 }
 
 PERIODS = {
