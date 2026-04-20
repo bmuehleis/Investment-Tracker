@@ -16,14 +16,15 @@ A personal investment tracking application built to run with a fully self-manage
 - Overview of open positions  
 - Monitor gains/losses per open position  
 - Full FX rate compatibility:
-  - View portfolio and position values in any currency  
+  - View portfolio and position values in any currency
+- Analytics dashboard:
+  - Portfolio benchmarking  
+  - Key performance indicators (KPIs)    
 
 ---
 
 ### 🔧 Planned Features
-- Analytics dashboard:
-  - Portfolio benchmarking  
-  - Key performance indicators (KPIs)  
+
 - Watchlist:
   - Track potential future investments  
 - Multiple portfolio accounts:
